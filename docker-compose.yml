@@ -3,7 +3,7 @@ version: "3.9"
 name: remindly
 
 networks:
-  app-net:
+  remindly-app-net:
     driver: bridge
 
 x-postgres-healthcheck: &postgres-healthcheck
@@ -25,6 +25,25 @@ services:
     ports:
       - "54321:5432"
     networks:
-      app-net:
+      - remindly-app-net
     volumes:
       - ./src/main/resources/db/dev:/docker-entrypoint-initdb.d
+
+  remindly:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    container_name: remindly
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-remindly:5432/remindlydb?currentSchema=remindly
+      SPRING_DATASOURCE_USERNAME: remindly
+      SPRING_DATASOURCE_PASSWORD: remindly
+      NTFY_ERRORS_TOPIC: ${NTFY_ERRORS_TOPIC}
+      NTFY_GARBAGE_COLLECTION_TOPIC: ${NTFY_GARBAGE_COLLECTION_TOPIC}
+    ports:
+      - "9999:8080"
+    depends_on:
+      postgres-remindly:
+        condition: service_healthy
+    networks:
+      - remindly-app-net

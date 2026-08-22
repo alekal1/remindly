@@ -40,21 +40,27 @@ Database defaults:
 
 1. Start PostgreSQL:
 
-   ```bash
-   docker compose up -d
-   ```
+```bash
+docker compose up -d
+```
 
 2. Run the application:
 
-   ```bash
-   ./gradlew bootRun
-   ```
+```bash
+./gradlew bootRun
+```
 
    On Windows:
 
-   ```powershell
-   .\gradlew.bat bootRun
-   ```
+```powershell
+.\gradlew.bat bootRun
+```
+   
+## Run with Docker
+
+```bash
+docker-compose --env-file .env up -d
+```
 
 ## Reminder behavior
 
