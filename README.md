@@ -59,3 +59,8 @@ Database defaults:
 ## Reminder behavior
 
 Reminders are processed automatically every second. When an event becomes due, the app sends the matching ntfy notification and marks the event as sent.
+
+## TO-DO
+
+- make cron frequency configurable from `application.yaml`
+- add on/off switches for notifications per ntfy topic

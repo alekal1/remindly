@@ -14,8 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -25,15 +25,13 @@ public class GarbageCollectionService {
   private final GarbageScheduleExtractorService garbageScheduleExtractorService;
   private final EventRepository eventRepository;
 
-  private final Set<EventType> eventTypes = Set.of(
-      EventType.BIO_WASTE_COLLECTION,
-      EventType.MIXED_WASTE_COLLECTION,
-      EventType.PACKAGING_WASTE_COLLECTION
-  );
-
   @Transactional
   public void resetAndExtractSchedules(MultipartFile file) {
-    eventRepository.deleteAllByTypeIn(eventTypes);
+    eventRepository.deleteAllByTypeIn(
+            Arrays.stream(GarbageCollectionSchedule.GarbageType.values())
+                    .map(GarbageCollectionSchedule.GarbageType::mapToEventType)
+                    .toList()
+    );
 
     List<GarbageCollectionSchedule> schedule;
     try {
@@ -42,11 +40,15 @@ public class GarbageCollectionService {
       List<EventEntity> entities = new ArrayList<>();
       for (var scheduleItem : schedule) {
         for (var date : scheduleItem.getDates()) {
+
           entities.add(EventEntity.builder()
                   .type(scheduleItem.getType().mapToEventType())
                   .scheduledAt(LocalDateTime.of(
                                   date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 15, 0)
                           .minusDays(1))
+                  .sentAt(LocalDateTime.now().toLocalDate().isAfter(date)
+                          ? LocalDateTime.now()
+                          : null)
                   .build());
         }
       }

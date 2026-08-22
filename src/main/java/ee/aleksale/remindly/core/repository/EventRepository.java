@@ -14,6 +14,6 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
   void deleteAllByTypeIn(Collection<EventType> types);
 
-  List<EventEntity> findAllBySentAtIsNullAndScheduledAtBetween(LocalDateTime from, LocalDateTime to);
+  List<EventEntity> findAllBySentAtIsNullAndScheduledAtLessThanEqual(LocalDateTime scheduledAt);
 
 }

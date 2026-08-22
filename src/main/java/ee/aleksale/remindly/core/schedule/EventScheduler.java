@@ -21,12 +21,11 @@ public class EventScheduler {
   private final EventRepository eventRepository;
   private final NtfyClient ntfyClient;
 
-  @Scheduled(cron = "*/1 * * * * *")
+  @Scheduled(cron = "0 0 * * * *")
   public void processEvents() {
     final var now = LocalDateTime.now(clock);
-    final var startOfDay = now.toLocalDate().atStartOfDay();
 
-    final var dueEvents = eventRepository.findAllBySentAtIsNullAndScheduledAtBetween(startOfDay, now);
+    final var dueEvents = eventRepository.findAllBySentAtIsNullAndScheduledAtLessThanEqual(now);
 
     for (var event : dueEvents) {
       ntfyClient.sendNotification(event.getType(), event.getType().getNotificationMessage());
