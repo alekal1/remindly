@@ -19,6 +19,7 @@ services:
     image: postgres:latest
     container_name: remindly-db
     environment:
+      TZ: Europe/Tallinn
       POSTGRES_DB: remindlydb
       POSTGRES_USER: remindly
       POSTGRES_PASSWORD: remindly
@@ -37,6 +38,7 @@ services:
         dockerfile: Dockerfile
     container_name: remindly
     environment:
+      TZ: Europe/Tallinn
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-remindly:5432/remindlydb?currentSchema=remindly
       SPRING_DATASOURCE_USERNAME: remindly
       SPRING_DATASOURCE_PASSWORD: remindly

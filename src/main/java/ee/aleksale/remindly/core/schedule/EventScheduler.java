@@ -23,9 +23,11 @@ public class EventScheduler {
 
   @Scheduled(cron = "0 0 * * * *")
   public void processEvents() {
+    log.info("Running event scheduler.");
     final var now = LocalDateTime.now(clock);
 
     final var dueEvents = eventRepository.findAllBySentAtIsNullAndScheduledAtLessThanEqual(now);
+    log.info("Found {} due events", dueEvents.size());
 
     for (var event : dueEvents) {
       ntfyClient.sendNotification(event.getType(), event.getType().getNotificationMessage());
