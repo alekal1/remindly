@@ -1,0 +1,25 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  application:
+    name: remindly
+  datasource:
+    url: jdbc:postgresql://localhost:54321/remindlydb?currentSchema=remindly
+    username: remindly
+    password: remindly
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 2
+  liquibase:
+    default-schema: liquibase
+    enabled: true
+    change-log: classpath:/db/changelog/changelog.xml
+
+app:
+  nfty:
+    topics:
+      errors: ${NTFY_ERRORS_TOPIC}
+      garbage-collection: ${NTFY_GARBAGE_COLLECTION_TOPIC}
+

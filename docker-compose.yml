@@ -1,0 +1,30 @@
+version: "3.9"
+
+name: remindly
+
+networks:
+  app-net:
+    driver: bridge
+
+x-postgres-healthcheck: &postgres-healthcheck
+  test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+  interval: 5s
+  timeout: 5s
+  retries: 20
+  start_period: 10s
+
+services:
+  postgres-remindly:
+    image: postgres:latest
+    container_name: remindly-db
+    environment:
+      POSTGRES_DB: remindlydb
+      POSTGRES_USER: remindly
+      POSTGRES_PASSWORD: remindly
+    healthcheck: *postgres-healthcheck
+    ports:
+      - "54321:5432"
+    networks:
+      app-net:
+    volumes:
+      - ./src/main/resources/db/dev:/docker-entrypoint-initdb.d
