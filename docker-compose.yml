@@ -15,6 +15,7 @@ x-postgres-healthcheck: &postgres-healthcheck
 
 services:
   postgres-remindly:
+    restart: unless-stopped
     image: postgres:latest
     container_name: remindly-db
     environment:
@@ -30,6 +31,7 @@ services:
       - ./src/main/resources/db/dev:/docker-entrypoint-initdb.d
 
   remindly:
+    restart: unless-stopped
     build:
         context: .
         dockerfile: Dockerfile
