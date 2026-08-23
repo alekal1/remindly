@@ -68,5 +68,6 @@ Reminders are processed automatically every second. When an event becomes due, t
 
 ## TO-DO
 
+- create event via IPhone using shortcuts
 - make cron frequency configurable from `application.yaml`
 - add on/off switches for notifications per ntfy topic
