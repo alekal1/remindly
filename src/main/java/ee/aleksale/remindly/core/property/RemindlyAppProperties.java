@@ -11,13 +11,13 @@ import java.util.List;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "app")
-public class RemindlyProperties {
+public class RemindlyAppProperties {
 
     @Getter
     @Setter
-    private List<Reminder> reminders;
+    private List<ReminderProperties> reminders;
 
-    public Reminder getReminder(ReminderType reminderType) {
+    public ReminderProperties getReminders(ReminderType reminderType) {
         final var reminder = reminders.stream()
                 .filter(n -> n.getName().equals(reminderType.getConfigKey()))
                 .findFirst();
@@ -30,7 +30,7 @@ public class RemindlyProperties {
 
     @Getter
     @Setter
-    public static class Reminder {
+    public static class ReminderProperties {
         private String name;
         private String topic;
         private boolean enabled;

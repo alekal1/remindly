@@ -31,7 +31,11 @@ public class EventScheduler {
     log.info("Found {} due events", dueEvents.size());
 
     for (var event : dueEvents) {
-      ntfyClient.sendNotification(event.getType(), event.getMessage());
+      ntfyClient.notification(event.getType())
+              .withMessage(event.getMessage())
+              .withDefaultEmojis()
+              .send();
+
       event.setSentAt(now);
       eventRepository.save(event);
     }

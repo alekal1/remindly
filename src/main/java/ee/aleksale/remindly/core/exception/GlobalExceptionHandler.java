@@ -18,6 +18,9 @@ public class GlobalExceptionHandler {
   public void handleException(Exception exception) {
     log.error("Unhandled exception during request processing", exception);
 
-    ntfyClient.sendNotification(EventType.REMINDLY_APP_ERROR, exception.getMessage());
+    ntfyClient.notification(EventType.REMINDLY_APP_ERROR)
+            .withMessage(exception.getMessage())
+            .withDefaultEmojis()
+            .send();
   }
 }

@@ -1,9 +1,6 @@
 # Remindly
 
-Remindly is a Spring Boot service that notifies user abount any kind of reminder with ntfy application.
-
-The current implementation uses **garbage collection** as the main example of how the app connects ntfy notifications
-with recurring reminders.
+Remindly is a Spring Boot service for scheduling reminders and delivering them through ntfy.
 
 ## Tech stack
 
@@ -11,23 +8,47 @@ with recurring reminders.
 - Spring Boot
 - PostgreSQL
 - Liquibase
-- ntfy [Learn more about ntfy](https://ntfy.sh/)
+- ntfy: https://ntfy.sh/
 
 ## Requirements
 
 - Java 25
 - Docker and Docker Compose
-- an ntfy topic for garbage collection reminders
-- an ntfy topic for error notifications
+- ntfy topics for the reminder types
+
+## Modules
+
+- `core` - shared domain, persistence, ntfy client, scheduler, and reminder guards.
+- `adhoc` - creates one-off reminders through `POST /v1/adhoc`.
+- `garbage_collection` - imports garbage collection schedules from PDF and converts them into reminders.
 
 ## Configuration
 
 The app reads environment variables from `.env` at startup.
 
-Required variables:
+NTFY topics are only needed for the reminder types that are enabled in `app.reminders`:
 
-- `NTFY_GARBAGE_COLLECTION_TOPIC`
 - `NTFY_ERRORS_TOPIC`
+- `NTFY_GARBAGE_COLLECTION_TOPIC`
+- `NTFY_ADHOC_TOPIC`
+
+**It is highly recommended to keep the `errors` reminder enabled, because app exceptions are reported through this channel.**
+
+Example reminder config:
+
+```yaml
+app:
+  reminders:
+    - name: errors
+      topic: ${NTFY_ERRORS_TOPIC}
+      enabled: true
+    - name: garbage-collection
+      topic: ${NTFY_GARBAGE_COLLECTION_TOPIC}
+      enabled: true
+    - name: adhoc
+      topic: ${NTFY_ADHOC_TOPIC}
+      enabled: true
+```
 
 Database defaults:
 
@@ -50,24 +71,49 @@ docker compose up -d
 ./gradlew bootRun
 ```
 
-   On Windows:
+On Windows:
 
 ```powershell
 .\gradlew.bat bootRun
 ```
-   
+
 ## Run with Docker
 
 ```bash
 docker-compose --env-file .env up -d
 ```
 
+## iPhone Shortcuts
+
+Tested only with the PC and iPhone connected to the same LAN.
+
+On Windows, open the application port if the phone cannot reach the PC over LAN:
+
+```powershell
+New-NetFirewallRule -DisplayName "Allow Docker TCP <APP-PORT>" `
+  -Direction Inbound `
+  -Protocol TCP `
+  -LocalPort <APP-PORT> `
+  -Action Allow
+```
+
+Use the Shortcuts action **Get Contents of URL**:
+
+1. Add a new shortcut and choose **Get Contents of URL**.
+2. Set the URL to `http://<PC-IP>:<APP-PORT>/v1/adhoc`.
+3. Set the method to `POST`.
+4. Set the request body to `JSON`.
+5. Send a payload like this:
+
+```json
+{
+  "message": "Take out the trash",
+  "scheduledAt": "2026-08-24T21:00:00"
+}
+```
+
 ## Reminder behavior
 
-Reminders are processed automatically every second. When an event becomes due, the app sends the matching ntfy notification and marks the event as sent.
+Reminders are processed automatically every minute.
 
-## TO-DO
-
-- create event via IPhone using shortcuts
-- make cron frequency configurable from `application.yaml`
-- add on/off switches for notifications per ntfy topic
+When an event becomes due, the app sends the matching ntfy notification and marks the event as sent.

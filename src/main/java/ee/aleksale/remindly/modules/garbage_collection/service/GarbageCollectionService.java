@@ -56,9 +56,11 @@ public class GarbageCollectionService {
 
       eventRepository.saveAll(entities);
 
-      ntfyClient.sendNotification(
-              EventType.GARBAGE_SCHEDULE_RESET,
-              String.format("Garbage collection schedule has been reset. %d entities were added", entities.size()));
+
+      ntfyClient.notification(EventType.GARBAGE_SCHEDULE_RESET)
+              .withDefaultEmojis()
+              .withMessage(String.format("Garbage collection schedule has been reset. %d entities were added", entities.size()))
+              .send();
     } catch (IOException e) {
       throw new RemindlyException(e.getMessage());
     }
