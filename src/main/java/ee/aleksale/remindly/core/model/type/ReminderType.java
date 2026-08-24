@@ -5,9 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum NtfyTopic {
+public enum ReminderType {
   ERRORS("errors"),
-  GARBAGE_COLLECTION("garbage-collection");
+  GARBAGE_COLLECTION("garbage-collection"),
+  ONE_TIME_REMINDER("one-time-reminder");
 
   private final String configKey;
 }

@@ -18,8 +18,14 @@ spring:
     change-log: classpath:/db/changelog/changelog.xml
 
 app:
-  nfty:
-    topics:
-      errors: ${NTFY_ERRORS_TOPIC}
-      garbage-collection: ${NTFY_GARBAGE_COLLECTION_TOPIC}
+  reminders:
+    - name: errors
+      topic: ${NTFY_ERRORS_TOPIC}
+      enabled: true
+    - name: garbage-collection
+      topic: ${NTFY_GARBAGE_COLLECTION_TOPIC}
+      enabled: true
+    - name: one-time-reminder
+      topic: ${NTFY_ONE_TIME_REMINDER_TOPIC}
+      enabled: false
 

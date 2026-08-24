@@ -14,8 +14,8 @@ public class GlobalExceptionHandler {
 
   private final NtfyClient ntfyClient;
 
-  @ExceptionHandler(RemindlyException.class)
-  public void handleException(RemindlyException exception) {
+  @ExceptionHandler(Exception.class)
+  public void handleException(Exception exception) {
     log.error("Unhandled exception during request processing", exception);
 
     ntfyClient.sendNotification(EventType.REMINDLY_APP_ERROR, exception.getMessage());

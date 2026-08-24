@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Slf4j
 @Component
@@ -21,10 +22,10 @@ public class EventScheduler {
   private final EventRepository eventRepository;
   private final NtfyClient ntfyClient;
 
-  @Scheduled(cron = "0 0 * * * *")
+  @Scheduled(cron = "0 * * * * *")
   public void processEvents() {
     log.info("Running event scheduler.");
-    final var now = LocalDateTime.now(clock);
+    final var now = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MINUTES);
 
     final var dueEvents = eventRepository.findAllBySentAtIsNullAndScheduledAtLessThanEqual(now);
     log.info("Found {} due events", dueEvents.size());
