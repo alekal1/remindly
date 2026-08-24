@@ -1,4 +1,4 @@
-package ee.aleksale.remindly.garbage_collection.dto;
+package ee.aleksale.remindly.modules.garbage_collection.dto;
 
 import ee.aleksale.remindly.core.model.type.EventType;
 import lombok.AllArgsConstructor;

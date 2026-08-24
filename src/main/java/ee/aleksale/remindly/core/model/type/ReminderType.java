@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum ReminderType {
   ERRORS("errors"),
   GARBAGE_COLLECTION("garbage-collection"),
-  ONE_TIME_REMINDER("one-time-reminder");
+  ADHOC("adhoc");
 
   private final String configKey;
 }

@@ -1,9 +1,9 @@
-package ee.aleksale.remindly.garbage_collection.service;
+package ee.aleksale.remindly.modules.garbage_collection.service;
 
 import ee.aleksale.remindly.core.exception.RemindlyException;
-import ee.aleksale.remindly.garbage_collection.dto.GarbageCollectionSchedule;
+import ee.aleksale.remindly.modules.garbage_collection.dto.GarbageCollectionSchedule;
 import ee.aleksale.remindly.core.service.FileExtractorService;
-import ee.aleksale.remindly.garbage_collection.utils.GarbageScheduleParser;
+import ee.aleksale.remindly.modules.garbage_collection.utils.GarbageScheduleParser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.text.PDFTextStripper;

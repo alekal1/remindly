@@ -1,6 +1,6 @@
-package ee.aleksale.remindly.garbage_collection.utils;
+package ee.aleksale.remindly.modules.garbage_collection.utils;
 
-import ee.aleksale.remindly.garbage_collection.dto.GarbageCollectionSchedule;
+import ee.aleksale.remindly.modules.garbage_collection.dto.GarbageCollectionSchedule;
 import lombok.experimental.UtilityClass;
 
 import java.time.LocalDate;

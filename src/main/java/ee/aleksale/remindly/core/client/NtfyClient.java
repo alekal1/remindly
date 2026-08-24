@@ -31,14 +31,17 @@ public class NtfyClient {
                     EventType.MIXED_WASTE_COLLECTION, ReminderType.GARBAGE_COLLECTION,
                     EventType.PACKAGING_WASTE_COLLECTION, ReminderType.GARBAGE_COLLECTION,
                     EventType.GARBAGE_SCHEDULE_RESET, ReminderType.GARBAGE_COLLECTION,
+
+                    EventType.ADHOC, ReminderType.ADHOC,
+
                     EventType.REMINDLY_APP_ERROR, ReminderType.ERRORS
             )
     );
   }
 
   public void sendNotification(EventType eventType, String message) {
-    final var notificationType = eventTypeToTopic.get(eventType);
-    final var topic = property.getReminder(notificationType);
+    final var reminderType = eventTypeToTopic.get(eventType);
+    final var topic = property.getReminder(reminderType);
 
     if (!topic.isEnabled()) {
       throw new RemindlyException("Notification for event type " + eventType + " is disabled.");

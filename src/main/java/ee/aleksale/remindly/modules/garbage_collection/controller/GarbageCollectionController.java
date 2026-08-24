@@ -1,8 +1,8 @@
-package ee.aleksale.remindly.garbage_collection.controller;
+package ee.aleksale.remindly.modules.garbage_collection.controller;
 
 import ee.aleksale.remindly.core.annotation.ReminderEnabled;
 import ee.aleksale.remindly.core.model.type.ReminderType;
-import ee.aleksale.remindly.garbage_collection.service.GarbageCollectionService;
+import ee.aleksale.remindly.modules.garbage_collection.service.GarbageCollectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
