@@ -14,6 +14,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Adhoc {
-  private String title;
+  private String message;
   private LocalDateTime scheduledAt;
 }

@@ -21,6 +21,7 @@ public class AdhocService {
 
     eventRepository.saveAndFlush(entity);
 
-    ntfyClient.sendNotification(entity.getType(), entity.getType().getNotificationMessage());
+    ntfyClient.sendNotification(entity.getType(),
+            String.format("Reminder for '%s' is scheduled at %s", entity.getMessage(), entity.getScheduledAt()));
   }
 }

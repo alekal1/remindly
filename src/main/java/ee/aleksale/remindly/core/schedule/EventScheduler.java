@@ -31,7 +31,7 @@ public class EventScheduler {
     log.info("Found {} due events", dueEvents.size());
 
     for (var event : dueEvents) {
-      ntfyClient.sendNotification(event.getType(), event.getType().getNotificationMessage());
+      ntfyClient.sendNotification(event.getType(), event.getMessage());
       event.setSentAt(now);
       eventRepository.save(event);
     }

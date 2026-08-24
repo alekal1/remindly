@@ -8,4 +8,8 @@
     <changeSet id="2026-20-08_init_db" author="Aleksandr Aleksandrov">
         <sqlFile path="sql/2026-20-08_init_db.sql" splitStatements="false" relativeToChangelogFile="true"/>
     </changeSet>
+
+    <changeSet id="2026-24-08_msg_column" author="Aleksandr Aleksandrov">
+        <sqlFile path="sql/2026-24-08_msg_column.sql" splitStatements="false" relativeToChangelogFile="true"/>
+    </changeSet>
 </databaseChangeLog>

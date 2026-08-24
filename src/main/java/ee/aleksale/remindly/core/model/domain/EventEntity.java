@@ -39,4 +39,7 @@ public class EventEntity {
 
   @Column(name = "sent_at")
   private LocalDateTime sentAt;
+
+  @Column(name = "message", nullable = false)
+  private String message;
 }

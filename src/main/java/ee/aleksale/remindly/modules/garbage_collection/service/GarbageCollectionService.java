@@ -49,6 +49,7 @@ public class GarbageCollectionService {
                   .sentAt(LocalDateTime.now().toLocalDate().isAfter(date)
                           ? LocalDateTime.now()
                           : null)
+                  .message(getMessageForGarbageType(scheduleItem.getType()))
                   .build());
         }
       }
@@ -61,5 +62,13 @@ public class GarbageCollectionService {
     } catch (IOException e) {
       throw new RemindlyException(e.getMessage());
     }
+  }
+
+  private String getMessageForGarbageType(GarbageCollectionSchedule.GarbageType garbageType) {
+    return switch (garbageType) {
+      case BIO -> "Bio waste collection is scheduled for tomorrow.";
+      case MIXED -> "Mixed waste collection is scheduled for tomorrow.";
+      case PACKAGING -> "Packaging waste collection is scheduled for tomorrow.";
+    };
   }
 }
