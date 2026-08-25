@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class EventScheduler {
   private final EventRepository eventRepository;
   private final NtfyClient ntfyClient;
 
+  @Transactional
   @Scheduled(cron = "0 * * * * *")
   public void processEvents() {
     log.info("Running event scheduler.");
