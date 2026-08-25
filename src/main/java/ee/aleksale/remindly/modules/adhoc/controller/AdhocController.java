@@ -4,6 +4,7 @@ import ee.aleksale.remindly.core.annotation.ReminderEnabled;
 import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.modules.adhoc.dto.Adhoc;
 import ee.aleksale.remindly.modules.adhoc.service.AdhocService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class AdhocController {
 
   @PostMapping
   @ReminderEnabled(type = ReminderType.ADHOC)
-  public ResponseEntity<?> scheduleAdhoc(@RequestBody Adhoc request) {
+  public ResponseEntity<?> scheduleAdhoc(@RequestBody @Valid Adhoc request) {
     adhocService.adhoc(request);
 
     return ResponseEntity.accepted().build();

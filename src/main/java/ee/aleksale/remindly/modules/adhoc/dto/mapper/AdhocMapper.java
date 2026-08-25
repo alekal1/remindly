@@ -11,6 +11,8 @@ public interface AdhocMapper {
 
   AdhocMapper INSTANCE = Mappers.getMapper(AdhocMapper.class);
 
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "sentAt", ignore = true)
   @Mapping(target = "type", constant = "ADHOC")
   EventEntity map(Adhoc adhoc);
 
