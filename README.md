@@ -50,6 +50,21 @@ app:
       enabled: true
 ```
 
+Reminder configuration is also exposed through Spring Actuator at `GET /actuator/info` under:
+
+```json
+{
+  "app": {
+    "reminders": [
+      {
+        "name": "errors",
+        "topic": "..."
+      }
+    ]
+  }
+}
+```
+
 Database defaults:
 
 - host: `localhost`

@@ -44,8 +44,9 @@ public class GarbageCollectionService {
           entities.add(EventEntity.builder()
                   .type(scheduleItem.getType().mapToEventType())
                   .scheduledAt(LocalDateTime.of(
-                                  date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 15, 0)
-                          .minusDays(1))
+                          date.getYear(),
+                          date.getMonthValue(),
+                          date.getDayOfMonth(), 9, 0))
                   .sentAt(LocalDateTime.now().toLocalDate().isAfter(date)
                           ? LocalDateTime.now()
                           : null)
@@ -68,9 +69,9 @@ public class GarbageCollectionService {
 
   private String getMessageForGarbageType(GarbageCollectionSchedule.GarbageType garbageType) {
     return switch (garbageType) {
-      case BIO -> "Bio waste collection is scheduled for tomorrow.";
-      case MIXED -> "Mixed waste collection is scheduled for tomorrow.";
-      case PACKAGING -> "Packaging waste collection is scheduled for tomorrow.";
+      case BIO -> "Bio waste collection is scheduled for today.";
+      case MIXED -> "Mixed waste collection is scheduled for today.";
+      case PACKAGING -> "Packaging waste collection is scheduled for today.";
     };
   }
 }

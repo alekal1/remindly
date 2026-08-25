@@ -17,6 +17,12 @@ spring:
     enabled: true
     change-log: classpath:/db/changelog/changelog.xml
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
 app:
   reminders:
     - name: errors
@@ -28,4 +34,3 @@ app:
     - name: adhoc
       topic: ${NTFY_ADHOC_TOPIC}
       enabled: true
-

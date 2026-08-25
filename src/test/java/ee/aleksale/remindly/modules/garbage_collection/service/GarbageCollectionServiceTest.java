@@ -97,7 +97,7 @@ public class GarbageCollectionServiceTest {
         .filter(e -> e.getType() == EventType.BIO_WASTE_COLLECTION)
         .findFirst()
         .orElseThrow();
-    assertEquals("Bio waste collection is scheduled for tomorrow.", bioEntity.getMessage());
+    assertEquals("Bio waste collection is scheduled for today.", bioEntity.getMessage());
     assertNotNull(bioEntity.getScheduledAt());
   }
 
@@ -176,19 +176,19 @@ public class GarbageCollectionServiceTest {
     verify(eventRepository).saveAll(eventListCaptor.capture());
 
     final var savedEntities = eventListCaptor.getValue();
-    assertEquals("Bio waste collection is scheduled for tomorrow.",
+    assertEquals("Bio waste collection is scheduled for today.",
         savedEntities.stream()
             .filter(e -> e.getType() == EventType.BIO_WASTE_COLLECTION)
             .findFirst()
             .orElseThrow()
             .getMessage());
-    assertEquals("Mixed waste collection is scheduled for tomorrow.",
+    assertEquals("Mixed waste collection is scheduled for today.",
         savedEntities.stream()
             .filter(e -> e.getType() == EventType.MIXED_WASTE_COLLECTION)
             .findFirst()
             .orElseThrow()
             .getMessage());
-    assertEquals("Packaging waste collection is scheduled for tomorrow.",
+    assertEquals("Packaging waste collection is scheduled for today.",
         savedEntities.stream()
             .filter(e -> e.getType() == EventType.PACKAGING_WASTE_COLLECTION)
             .findFirst()
