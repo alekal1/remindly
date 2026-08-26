@@ -43,6 +43,8 @@ class NtfyClientTest {
     final var reminder = reminder("adhoc", "topic-adhoc", true);
     final var urlCaptor = ArgumentCaptor.forClass(String.class);
     final var requestCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+
+    doReturn("http://ntfy.sh").when(properties).getNtfyServer();
     doReturn(reminder).when(properties).getReminders(ReminderType.ADHOC);
     doReturn(ResponseEntity.ok().build())
             .when(restTemplate)

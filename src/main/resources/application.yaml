@@ -24,6 +24,7 @@ management:
         include: health,info
 
 app:
+  ntfy-server: ${NTFY_SERVER:https://ntfy.sh}
   reminders:
     - name: errors
       topic: ${NTFY_ERRORS_TOPIC}

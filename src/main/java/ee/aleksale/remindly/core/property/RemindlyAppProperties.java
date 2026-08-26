@@ -13,8 +13,7 @@ import java.util.List;
 @ConfigurationProperties(prefix = "app")
 public class RemindlyAppProperties {
 
-    @Getter
-    @Setter
+    private String ntfyServer;
     private List<ReminderProperties> reminders;
 
     public ReminderProperties getReminders(ReminderType reminderType) {

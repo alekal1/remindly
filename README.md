@@ -26,6 +26,8 @@ Remindly is a Spring Boot service for scheduling reminders and delivering them t
 
 The app reads environment variables from `.env` at startup.
 
+By default, the ntfy server is `https://ntfy.sh`. You can override this by setting the `NTFY_SERVER` environment variable.
+
 NTFY topics are only needed for the reminder types that are enabled in `app.reminders`:
 
 - `NTFY_ERRORS_TOPIC`

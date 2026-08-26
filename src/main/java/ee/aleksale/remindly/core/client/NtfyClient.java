@@ -20,7 +20,6 @@ import java.util.Map;
 @Service
 public class NtfyClient {
 
-  private static final String NTFY_BASE_URL = "http://ntfy.sh/%s";
   private static final String NTFY_EMOJIS_HEADER = "Tags";
   private static final String NTFY_TITLE_HEADER = "Title";
 
@@ -49,7 +48,7 @@ public class NtfyClient {
     final var request = new HttpEntity<>(payload.message(), headers);
 
     restTemplate.postForEntity(
-            String.format(NTFY_BASE_URL, reminder.getTopic()),
+            property.getNtfyServer() + "/" + reminder.getTopic(),
             request,
             Void.class
     );
