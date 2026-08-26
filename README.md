@@ -77,7 +77,7 @@ Database defaults:
 1. Start PostgreSQL:
 
 ```bash
-docker compose up -d
+docker compose up -d postgres-remindly
 ```
 
 2. Run the application:
