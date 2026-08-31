@@ -79,6 +79,7 @@ public class GarbageCollectionServiceTest {
     doReturn(fileBytes).when(file).getBytes();
     doReturn(schedules).when(garbageScheduleExtractorService).extract(fileBytes);
     doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
 
@@ -118,6 +119,7 @@ public class GarbageCollectionServiceTest {
     doReturn(fileBytes).when(file).getBytes();
     doReturn(schedules).when(garbageScheduleExtractorService).extract(fileBytes);
     doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
 
@@ -168,6 +170,7 @@ public class GarbageCollectionServiceTest {
     doReturn(fileBytes).when(file).getBytes();
     doReturn(schedules).when(garbageScheduleExtractorService).extract(fileBytes);
     doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
 

@@ -21,6 +21,7 @@ Remindly is a Spring Boot service for scheduling reminders and delivering them t
 - `core` - shared domain, persistence, ntfy client, scheduler, and reminder guards.
 - `adhoc` - creates one-off reminders through `POST /v1/adhoc`.
 - `garbage_collection` - imports garbage collection schedules from PDF and converts them into reminders.
+- `snooze` - Snooze functionality for reminders
 
 ## Configuration
 

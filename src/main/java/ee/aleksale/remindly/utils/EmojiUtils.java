@@ -17,6 +17,9 @@ public class EmojiUtils {
   public static final String MEMO = "memo"; // 📝
   public static final String BELL = "bell"; // 🔔
 
+  public static final String ZZZ = "zzz"; // 💤
+  public static final String SLEEPING = "sleeping"; // 😴
+
   public static final String ROTATING_LIGHT = "rotating_light"; // 🚨
   public static final String ARROWS_COUNTERCLOCKWISE = "arrows_counterclockwise"; // 🔄
 
@@ -29,6 +32,7 @@ public class EmojiUtils {
       case PACKAGING_WASTE_COLLECTION -> List.of(PACKAGE, LABEL);
       case GARBAGE_SCHEDULE_RESET -> List.of(ARROWS_COUNTERCLOCKWISE);
       case ADHOC -> List.of(MEMO, BELL);
+      case SNOOZE -> List.of(ZZZ, SLEEPING);
       case REMINDLY_APP_ERROR -> List.of(ROTATING_LIGHT);
       default -> List.of(PUSHPIN);
     };

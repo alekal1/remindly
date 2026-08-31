@@ -1,34 +1,31 @@
 package ee.aleksale.remindly.core.client;
 
-import static java.util.Map.entry;
-
 import ee.aleksale.remindly.core.exception.RemindlyException;
+import ee.aleksale.remindly.core.model.dto.NtfyAction;
+import ee.aleksale.remindly.core.model.dto.NtfyRequestPayload;
 import ee.aleksale.remindly.core.model.type.EventType;
 import ee.aleksale.remindly.core.property.RemindlyAppProperties;
+import ee.aleksale.remindly.core.service.NtfyHeaderService;
 import ee.aleksale.remindly.utils.EmojiUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.util.MultiValueMap;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
 public class NtfyClient {
 
-  private static final String NTFY_EMOJIS_HEADER = "Tags";
-  private static final String NTFY_TITLE_HEADER = "Title";
-
   private final RestTemplate restTemplate;
   private final RemindlyAppProperties property;
+  private final NtfyHeaderService ntfyHeaderService;
 
-  public NtfyClient(RestTemplate restTemplate, RemindlyAppProperties property) {
+  public NtfyClient(RestTemplate restTemplate, RemindlyAppProperties property, NtfyHeaderService ntfyHeaderService) {
     this.restTemplate = restTemplate;
     this.property = property;
+    this.ntfyHeaderService = ntfyHeaderService;
   }
 
   private void sendNotification(NtfyRequestPayload payload) {
@@ -40,11 +37,8 @@ public class NtfyClient {
       throw new RemindlyException("Notification for event type " + eventType + " is disabled.");
     }
 
-    final var headers = new HttpHeaders(
-            MultiValueMap.fromSingleValue(Map.ofEntries(
-                    entry(NTFY_EMOJIS_HEADER, payload.emojis),
-                    entry(NTFY_TITLE_HEADER, reminderType.toString())
-            )));
+    var headers = ntfyHeaderService.getHeaders(payload);
+
     final var request = new HttpEntity<>(payload.message(), headers);
 
     restTemplate.postForEntity(
@@ -63,12 +57,19 @@ public class NtfyClient {
     private final NtfyClient client;
     private final EventType eventType;
 
+    private String title;
     private String message;
     private List<String> emojis;
+    private List<NtfyAction> ntfyActions;
 
     private NtfyRequestBuilder(NtfyClient client, EventType eventType) {
       this.client = client;
       this.eventType = eventType;
+    }
+
+    public NtfyRequestBuilder withTitle(String title) {
+      this.title = title;
+      return this;
     }
 
     public NtfyRequestBuilder withMessage(String message) {
@@ -86,11 +87,24 @@ public class NtfyClient {
       return this;
     }
 
+    public NtfyRequestBuilder withAction(NtfyAction action) {
+      this.ntfyActions = List.of(action);
+      return this;
+    }
+
+    public NtfyRequestBuilder withActions(List<NtfyAction> actions) {
+      this.ntfyActions = actions;
+      return this;
+    }
+
     public void send() {
-      client.sendNotification(new NtfyRequestPayload(eventType, message, String.join(",", emojis)));
+      client.sendNotification(new NtfyRequestPayload(
+              eventType,
+              title,
+              message,
+              ntfyActions,
+              emojis == null ? null : String.join(",", emojis)
+      ));
     }
   }
-
-  private record NtfyRequestPayload(EventType eventType, String message, String emojis) {}
-
 }

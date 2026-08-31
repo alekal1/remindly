@@ -31,6 +31,7 @@ class GlobalExceptionHandlerTest {
     final var exception = new RuntimeException("boom");
 
     doReturn(ntfyRequestBuilder).when(ntfyClient).notification(EventType.REMINDLY_APP_ERROR);
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
 

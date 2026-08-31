@@ -45,6 +45,7 @@ public class AdhocServiceTest {
     final var dto = Adhoc.builder().message("test").build();
 
     doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
 

@@ -59,6 +59,7 @@ public class GarbageCollectionService {
 
 
       ntfyClient.notification(EventType.GARBAGE_SCHEDULE_RESET)
+              .withTitle(EventType.GARBAGE_SCHEDULE_RESET.name())
               .withDefaultEmojis()
               .withMessage(String.format("Garbage collection schedule has been reset. %d entities were added", entities.size()))
               .send();

@@ -13,6 +13,7 @@ import java.util.List;
 @ConfigurationProperties(prefix = "app")
 public class RemindlyAppProperties {
 
+    private String externalBaseUrl;
     private String ntfyServer;
     private List<ReminderProperties> reminders;
 

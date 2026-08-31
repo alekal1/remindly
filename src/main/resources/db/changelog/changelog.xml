@@ -12,4 +12,8 @@
     <changeSet id="2026-24-08_msg_column" author="Aleksandr Aleksandrov">
         <sqlFile path="sql/2026-24-08_msg_column.sql" splitStatements="false" relativeToChangelogFile="true"/>
     </changeSet>
+
+    <changeSet id="2026-31-08_parent_event" author="Aleksandr Aleksandrov">
+        <sqlFile path="sql/2026-31-08_parent_event.sql" splitStatements="false" relativeToChangelogFile="true"/>
+    </changeSet>
 </databaseChangeLog>

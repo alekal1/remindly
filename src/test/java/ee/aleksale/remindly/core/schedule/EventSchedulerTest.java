@@ -1,6 +1,7 @@
 package ee.aleksale.remindly.core.schedule;
 
 import ee.aleksale.remindly.core.client.NtfyClient;
+import ee.aleksale.remindly.core.property.RemindlyAppProperties;
 import ee.aleksale.remindly.core.model.domain.EventEntity;
 import ee.aleksale.remindly.core.model.type.EventType;
 import ee.aleksale.remindly.core.repository.EventRepository;
@@ -18,10 +19,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 class EventSchedulerTest {
@@ -29,12 +32,16 @@ class EventSchedulerTest {
   private EventRepository eventRepository;
   private NtfyClient ntfyClient;
   private NtfyClient.NtfyRequestBuilder ntfyRequestBuilder;
+  private RemindlyAppProperties properties;
+  private ObjectMapper objectMapper;
 
   @BeforeEach()
   void init() {
     eventRepository = mock(EventRepository.class);
     ntfyClient = mock(NtfyClient.class);
     ntfyRequestBuilder = mock(NtfyClient.NtfyRequestBuilder.class);
+    properties = mock(RemindlyAppProperties.class);
+    objectMapper = new ObjectMapper();
   }
 
   @Test
@@ -52,10 +59,13 @@ class EventSchedulerTest {
             .when(eventRepository)
             .findAllBySentAtIsNullAndScheduledAtLessThanEqual(dueAt);
     doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withActions(anyList());
+    doReturn("https://example.com").when(properties).getExternalBaseUrl();
 
-    final var scheduler = new EventScheduler(clock, eventRepository, ntfyClient);
+    final var scheduler = new EventScheduler(clock, eventRepository, ntfyClient, properties, objectMapper);
 
     scheduler.processEvents();
     scheduler.processEvents();

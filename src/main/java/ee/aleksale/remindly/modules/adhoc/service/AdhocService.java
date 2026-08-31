@@ -2,6 +2,7 @@ package ee.aleksale.remindly.modules.adhoc.service;
 
 import ee.aleksale.remindly.core.client.NtfyClient;
 import ee.aleksale.remindly.core.model.type.EventType;
+import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.repository.EventRepository;
 import ee.aleksale.remindly.modules.adhoc.dto.Adhoc;
 import ee.aleksale.remindly.modules.adhoc.dto.mapper.AdhocMapper;
@@ -23,6 +24,7 @@ public class AdhocService {
     eventRepository.saveAndFlush(entity);
 
     ntfyClient.notification(EventType.ADHOC)
+              .withTitle(ReminderType.ADHOC.name())
               .withMessage(String.format("Reminder for '%s' is scheduled at %s",
                       entity.getMessage(), entity.getScheduledAt()))
               .withDefaultEmojis()
