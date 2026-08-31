@@ -37,7 +37,7 @@ public class SnoozeService {
             .withTitle(EventType.SNOOZE.name())
             .withMessage(String.format("Reminder for '%s' is snoozed to %s",
                     parentEvent.getMessage(), snoozedEvent.getScheduledAt()))
-            .withEmojis(List.of(EmojiUtils.PUSHPIN, EmojiUtils.MEMO, EmojiUtils.BELL))
+            .withEmojis(List.of(EmojiUtils.ZZZ, EmojiUtils.SLEEPING))
             .send();
 
   }

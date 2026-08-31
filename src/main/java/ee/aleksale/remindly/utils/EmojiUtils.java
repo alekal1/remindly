@@ -32,7 +32,7 @@ public class EmojiUtils {
       case PACKAGING_WASTE_COLLECTION -> List.of(PACKAGE, LABEL);
       case GARBAGE_SCHEDULE_RESET -> List.of(ARROWS_COUNTERCLOCKWISE);
       case ADHOC -> List.of(MEMO, BELL);
-      case SNOOZE -> List.of(ZZZ, SLEEPING);
+      case SNOOZE -> List.of(PUSHPIN, MEMO, BELL);
       case REMINDLY_APP_ERROR -> List.of(ROTATING_LIGHT);
       default -> List.of(PUSHPIN);
     };
