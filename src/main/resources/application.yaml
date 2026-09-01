@@ -25,14 +25,14 @@ management:
 
 app:
   externalBaseUrl: ${APP_EXTERNAL_BASE_URL}
-  ntfy-server: ${NTFY_SERVER:https://ntfy.sh}
+  ntfy-server: ${NTFY_SERVER_URL}
   reminders:
     - name: errors
       topic: ${NTFY_ERRORS_TOPIC}
-      enabled: ${NTFY_ERRORS_TOPIC_ENABLED:true}
+      enabled: ${NTFY_ERRORS_TOPIC_ENABLED}
     - name: garbage-collection
       topic: ${NTFY_GARBAGE_COLLECTION_TOPIC}
-      enabled: ${NTFY_GARBAGE_COLLECTION_TOPIC_ENABLED:false}
+      enabled: ${NTFY_GARBAGE_COLLECTION_TOPIC_ENABLED}
     - name: adhoc
       topic: ${NTFY_ADHOC_TOPIC}
-      enabled: ${NTFY_ADHOC_TOPIC_ENABLED:true}
+      enabled: ${NTFY_ADHOC_TOPIC_ENABLED}
