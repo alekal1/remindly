@@ -19,4 +19,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   List<EventEntity> findAllBySentAtIsNullAndScheduledAtLessThanEqual(LocalDateTime scheduledAt);
 
+  boolean existsByTypeAndScheduledAtBetween(
+      EventType type, LocalDateTime scheduledAtStart, LocalDateTime scheduledAtEnd);
+
 }

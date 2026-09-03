@@ -1,4 +1,4 @@
-package ee.aleksale.remindly.modules.garbage_collection.dto;
+package ee.aleksale.remindly.modules.garbage_collection.garbage.dto;
 
 import ee.aleksale.remindly.core.model.type.EventType;
 import lombok.AllArgsConstructor;
@@ -31,6 +31,15 @@ public class GarbageCollectionSchedule {
         case BIO -> EventType.BIO_WASTE_COLLECTION;
         case MIXED -> EventType.MIXED_WASTE_COLLECTION;
         case PACKAGING -> EventType.PACKAGING_WASTE_COLLECTION;
+      };
+    }
+
+    public static GarbageCollectionSchedule.GarbageType mapFromString(String type) {
+      return switch (type.toLowerCase()) {
+        case "biolagunevad köögi-ja sööklajäätmed" -> GarbageCollectionSchedule.GarbageType.BIO;
+        case "segaolmejäätmed" -> GarbageCollectionSchedule.GarbageType.MIXED;
+        case "paber ja papp" -> GarbageCollectionSchedule.GarbageType.PACKAGING;
+        default -> throw new IllegalArgumentException("Unknown garbage type: " + type);
       };
     }
   }

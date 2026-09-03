@@ -1,6 +1,6 @@
 package ee.aleksale.remindly.modules.garbage_collection.utils;
 
-import ee.aleksale.remindly.modules.garbage_collection.dto.GarbageCollectionSchedule;
+import ee.aleksale.remindly.modules.garbage_collection.garbage.dto.GarbageCollectionSchedule;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

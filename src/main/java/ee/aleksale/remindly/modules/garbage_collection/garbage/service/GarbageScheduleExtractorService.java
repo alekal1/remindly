@@ -1,8 +1,8 @@
-package ee.aleksale.remindly.modules.garbage_collection.service;
+package ee.aleksale.remindly.modules.garbage_collection.garbage.service;
 
 import ee.aleksale.remindly.core.exception.RemindlyException;
-import ee.aleksale.remindly.modules.garbage_collection.dto.GarbageCollectionSchedule;
-import ee.aleksale.remindly.core.service.FileExtractorService;
+import ee.aleksale.remindly.core.service.ExtractorService;
+import ee.aleksale.remindly.modules.garbage_collection.garbage.dto.GarbageCollectionSchedule;
 import ee.aleksale.remindly.modules.garbage_collection.utils.GarbageScheduleParser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class GarbageScheduleExtractorService implements FileExtractorService<List<GarbageCollectionSchedule>> {
+public class GarbageScheduleExtractorService implements ExtractorService<List<GarbageCollectionSchedule>, byte[]> {
 
   @Override
   public List<GarbageCollectionSchedule> extract(byte[] bytes) {

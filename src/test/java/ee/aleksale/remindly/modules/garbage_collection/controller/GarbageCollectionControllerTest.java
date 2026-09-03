@@ -9,7 +9,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import ee.aleksale.remindly.core.client.NtfyClient;
-import ee.aleksale.remindly.modules.garbage_collection.service.GarbageCollectionService;
+import ee.aleksale.remindly.modules.garbage_collection.garbage.controller.GarbageCollectionController;
+import ee.aleksale.remindly.modules.garbage_collection.garbage.service.GarbageCollectionService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -25,7 +25,6 @@ import java.util.Map;
 
 @Slf4j
 @Component
-@EnableScheduling
 @RequiredArgsConstructor
 public class EventScheduler {
 

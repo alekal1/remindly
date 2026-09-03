@@ -1,6 +1,6 @@
 package ee.aleksale.remindly.core.service;
 
-public interface ExtractorService<T, D> {
+public interface ExtractorService<RESULT, INPUT> {
 
-  T extract(D data);
+  RESULT extract(INPUT data);
 }

@@ -50,10 +50,20 @@ services:
       NTFY_GARBAGE_COLLECTION_TOPIC_ENABLED: ${NTFY_GARBAGE_COLLECTION_TOPIC_ENABLED}
       NTFY_ADHOC_TOPIC: ${NTFY_ADHOC_TOPIC}
       NTFY_ADHOC_TOPIC_ENABLED: ${NTFY_ADHOC_TOPIC_ENABLED}
+      GMAIL_CREDENTIALS_FILE: /secrets/google-credentials.json
+      GMAIL_TOKEN_DIRECTORY: /app/data/gmail
+      GMAIL_SENDER: ${GMAIL_SENDER}
+      GMAIL_AUTH_CALLBACK_BASE_URL: ${GMAIL_AUTH_CALLBACK_BASE_URL}
     ports:
       - "9999:8080"
+    volumes:
+      - ./secrets/google-credentials.json:/secrets/google-credentials.json:ro
+      - remindly-data:/app/data
     depends_on:
       postgres-remindly:
         condition: service_healthy
     networks:
       - remindly-app-net
+
+volumes:
+  remindly-data:

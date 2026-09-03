@@ -13,7 +13,7 @@ public class EnvUtils {
   private static final String COMMENT = "#";
   private static final String EQUALS = "=";
   private static final String ENV_FILE_PATH_PROPERTY = "remindly.env.file.path";
-  private static final String DEFAULT_ENV_FILE_PATH = ".env";
+  private static final String DEFAULT_ENV_FILE_PATH = "secrets/.env";
 
   public static void loadEnvFile() {
     final var envPath = Path.of(System.getProperty(ENV_FILE_PATH_PROPERTY, DEFAULT_ENV_FILE_PATH));

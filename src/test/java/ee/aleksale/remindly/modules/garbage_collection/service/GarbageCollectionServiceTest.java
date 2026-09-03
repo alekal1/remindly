@@ -15,12 +15,15 @@ import ee.aleksale.remindly.core.exception.RemindlyException;
 import ee.aleksale.remindly.core.model.domain.EventEntity;
 import ee.aleksale.remindly.core.model.type.EventType;
 import ee.aleksale.remindly.core.repository.EventRepository;
-import ee.aleksale.remindly.modules.garbage_collection.dto.GarbageCollectionSchedule;
+import ee.aleksale.remindly.modules.garbage_collection.garbage.dto.GarbageCollectionSchedule;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+
+import ee.aleksale.remindly.modules.garbage_collection.garbage.service.GarbageCollectionService;
+import ee.aleksale.remindly.modules.garbage_collection.garbage.service.GarbageScheduleExtractorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

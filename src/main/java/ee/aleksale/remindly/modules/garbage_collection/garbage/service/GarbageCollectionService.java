@@ -1,11 +1,11 @@
-package ee.aleksale.remindly.modules.garbage_collection.service;
+package ee.aleksale.remindly.modules.garbage_collection.garbage.service;
 
 import ee.aleksale.remindly.core.client.NtfyClient;
 import ee.aleksale.remindly.core.exception.RemindlyException;
 import ee.aleksale.remindly.core.model.domain.EventEntity;
 import ee.aleksale.remindly.core.model.type.EventType;
 import ee.aleksale.remindly.core.repository.EventRepository;
-import ee.aleksale.remindly.modules.garbage_collection.dto.GarbageCollectionSchedule;
+import ee.aleksale.remindly.modules.garbage_collection.garbage.dto.GarbageCollectionSchedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,35 +37,51 @@ public class GarbageCollectionService {
     try {
       schedule = garbageScheduleExtractorService.extract(file.getBytes());
 
-      List<EventEntity> entities = new ArrayList<>();
-      for (var scheduleItem : schedule) {
-        for (var date : scheduleItem.getDates()) {
-
-          entities.add(EventEntity.builder()
-                  .type(scheduleItem.getType().mapToEventType())
-                  .scheduledAt(LocalDateTime.of(
-                          date.getYear(),
-                          date.getMonthValue(),
-                          date.getDayOfMonth(), 9, 0))
-                  .sentAt(LocalDateTime.now().toLocalDate().isAfter(date)
-                          ? LocalDateTime.now()
-                          : null)
-                  .message(getMessageForGarbageType(scheduleItem.getType()))
-                  .build());
-        }
-      }
-
-      eventRepository.saveAll(entities);
-
+      final var savedSize = saveAllGarbageSchedulesNoDuplicate(schedule);
 
       ntfyClient.notification(EventType.GARBAGE_SCHEDULE_RESET)
               .withTitle(EventType.GARBAGE_SCHEDULE_RESET.name())
               .withDefaultEmojis()
-              .withMessage(String.format("Garbage collection schedule has been reset. %d entities were added", entities.size()))
+              .withMessage(String.format("Garbage collection schedule has been reset. %d entities were added", savedSize))
               .send();
     } catch (IOException e) {
       throw new RemindlyException(e.getMessage());
     }
+  }
+
+  @Transactional
+  public int saveAllGarbageSchedulesNoDuplicate(List<GarbageCollectionSchedule> schedules) {
+    List<EventEntity> entities = new ArrayList<>();
+    for (var scheduleItem : schedules) {
+      for (var date : scheduleItem.getDates()) {
+
+        final var alreadyExists = eventRepository.existsByTypeAndScheduledAtBetween(
+                scheduleItem.getType().mapToEventType(),
+                date.atStartOfDay(),
+                date.plusDays(1).atStartOfDay().minusNanos(1)
+        );
+
+        if (alreadyExists) {
+          continue;
+        }
+
+        entities.add(EventEntity.builder()
+                .type(scheduleItem.getType().mapToEventType())
+                .scheduledAt(LocalDateTime.of(
+                        date.getYear(),
+                        date.getMonthValue(),
+                        date.getDayOfMonth(), 8, 0))
+                .sentAt(LocalDateTime.now().toLocalDate().isAfter(date)
+                        ? LocalDateTime.now()
+                        : null)
+                .message(getMessageForGarbageType(scheduleItem.getType()))
+                .build());
+      }
+    }
+
+    eventRepository.saveAll(entities);
+
+    return entities.size();
   }
 
   private String getMessageForGarbageType(GarbageCollectionSchedule.GarbageType garbageType) {

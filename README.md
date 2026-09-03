@@ -98,7 +98,7 @@ On Windows:
 ## Run with Docker
 
 ```bash
-docker-compose --env-file .env up -d
+docker-compose --env-file secrets/.env up -d
 ```
 
 ## iPhone Shortcuts

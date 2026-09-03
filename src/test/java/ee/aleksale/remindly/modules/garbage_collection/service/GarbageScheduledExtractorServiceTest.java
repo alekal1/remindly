@@ -3,6 +3,7 @@ package ee.aleksale.remindly.modules.garbage_collection.service;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import ee.aleksale.remindly.core.exception.RemindlyException;
+import ee.aleksale.remindly.modules.garbage_collection.garbage.service.GarbageScheduleExtractorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

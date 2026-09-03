@@ -1,11 +1,13 @@
 package ee.aleksale.remindly.core.repository;
 
+import ee.aleksale.remindly.core.config.EnvApplicationContextInitializer;
 import ee.aleksale.remindly.core.model.domain.EventEntity;
 import ee.aleksale.remindly.core.model.type.EventType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
 @SpringBootTest
+@ContextConfiguration(initializers = EnvApplicationContextInitializer.class)
 @Transactional
 class EventRepositoryTest {
 

@@ -1,7 +1,10 @@
 HELP.md
 .gradle
 build/
-.env
+secrets/.env
+secrets/.env.docker
+secrets/google-credentials.json
+secrets/gmail
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

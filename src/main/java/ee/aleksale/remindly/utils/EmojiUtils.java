@@ -24,6 +24,7 @@ public class EmojiUtils {
   public static final String ARROWS_COUNTERCLOCKWISE = "arrows_counterclockwise"; // 🔄
 
   public static final String PUSHPIN = "pushpin "; // 📌
+  public static final String ENVELOPE_WITH_ARROW = "envelope_with_arrow"; // 📩
 
   public static List<String> getEmojisForEventType(EventType eventType) {
     return switch (eventType) {
@@ -31,6 +32,7 @@ public class EmojiUtils {
       case MIXED_WASTE_COLLECTION -> List.of(WASTEBASKET, RECYCLE);
       case PACKAGING_WASTE_COLLECTION -> List.of(PACKAGE, LABEL);
       case GARBAGE_SCHEDULE_RESET -> List.of(ARROWS_COUNTERCLOCKWISE);
+      case GARBAGE_SCHEDULE_FETCHED -> List.of(ENVELOPE_WITH_ARROW);
       case ADHOC -> List.of(MEMO, BELL);
       case SNOOZE -> List.of(PUSHPIN, MEMO, BELL);
       case REMINDLY_APP_ERROR -> List.of(ROTATING_LIGHT);

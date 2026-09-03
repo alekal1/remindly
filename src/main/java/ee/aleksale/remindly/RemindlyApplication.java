@@ -1,6 +1,6 @@
 package ee.aleksale.remindly;
 
-import ee.aleksale.remindly.utils.EnvUtils;
+import ee.aleksale.remindly.core.config.EnvApplicationContextInitializer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -12,8 +12,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class RemindlyApplication {
 
   static void main(String[] args) {
-    EnvUtils.loadEnvFile();
-    SpringApplication.run(RemindlyApplication.class, args);
+    SpringApplication application = new SpringApplication(RemindlyApplication.class);
+    application.addInitializers(new EnvApplicationContextInitializer());
+    application.run(args);
   }
 
 }

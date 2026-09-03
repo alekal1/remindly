@@ -36,3 +36,8 @@ app:
     - name: adhoc
       topic: ${NTFY_ADHOC_TOPIC}
       enabled: ${NTFY_ADHOC_TOPIC_ENABLED}
+  gmail:
+    credentials-file: ${GMAIL_CREDENTIALS_FILE}
+    token-directory: ${GMAIL_TOKEN_DIRECTORY}
+    sender: ${GMAIL_SENDER}
+    auth-callback-url: ${GMAIL_AUTH_CALLBACK_BASE_URL}

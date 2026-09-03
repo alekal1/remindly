@@ -1,6 +1,6 @@
 package ee.aleksale.remindly.modules.garbage_collection.utils;
 
-import ee.aleksale.remindly.modules.garbage_collection.dto.GarbageCollectionSchedule;
+import ee.aleksale.remindly.modules.garbage_collection.garbage.dto.GarbageCollectionSchedule;
 import lombok.experimental.UtilityClass;
 
 import java.time.LocalDate;
@@ -32,7 +32,7 @@ public class GarbageScheduleParser {
     for (int i = 0; i < headers.size(); i++) {
       var header = headers.get(i);
       var block = extractBlockBetweenHeaders(text, headers, i);
-      var type = mapType(header.group(3));
+      var type = GarbageCollectionSchedule.GarbageType.mapFromString(header.group(3));
       var dates = extractDatesFromBlock(block);
 
       result.add(GarbageCollectionSchedule.builder()
@@ -73,14 +73,5 @@ public class GarbageScheduleParser {
     }
 
     return headers;
-  }
-
-  private GarbageCollectionSchedule.GarbageType mapType(String type) {
-    return switch (type.toLowerCase()) {
-      case "biolagunevad köögi-ja sööklajäätmed" -> GarbageCollectionSchedule.GarbageType.BIO;
-      case "segaolmejäätmed" -> GarbageCollectionSchedule.GarbageType.MIXED;
-      case "paber ja papp" -> GarbageCollectionSchedule.GarbageType.PACKAGING;
-      default -> throw new IllegalArgumentException("Unknown garbage type: " + type);
-    };
   }
 }
