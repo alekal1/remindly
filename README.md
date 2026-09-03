@@ -20,7 +20,9 @@ Remindly is a Spring Boot service for scheduling reminders and delivering them t
 
 - `core` - shared domain, persistence, ntfy client, scheduler, and reminder guards.
 - `adhoc` - creates one-off reminders through `POST /v1/adhoc`.
-- `garbage_collection` - imports garbage collection schedules from PDF and converts them into reminders.
+- `garbage_collection` - imports garbage collection schedules and converts them into reminders. Contains two submodules:
+  - `garbage` - parses garbage collection schedule PDFs and creates reminder events.
+  - `gmail` - fetches the schedule PDF as a Gmail attachment via the Gmail API and hands it off to `garbage` for processing.
 - `snooze` - Snooze functionality for reminders
 
 ## Configuration
@@ -74,6 +76,33 @@ Database defaults:
 - port: `54321`
 - database: `remindlydb`
 - user/password: `remindly` / `remindly`
+
+## Gmail integration
+
+**Note:** this integration is very specific to one waste collection provider's notification email.
+`GmailHtmlExtractor` parses the HTML body of the message looking for a table with the exact Estonian column headers
+`Jäätmeliik` (waste type) and `Tühjendamise kuupäev` (collection date).
+Any other email format/structure will not be recognized and will simply produce no schedule.
+
+The `gmail` submodule reads garbage collection schedules from Gmail messages using the Gmail API. 
+
+**It is optional and only activates when a valid credentials file is configured.**
+
+Configuration (`app.gmail`):
+
+| Env variable | Property | Description |
+|---|---|---|
+| `GMAIL_CREDENTIALS_FILE` | `credentials-file` | Path to the Google OAuth client credentials JSON (see `secrets/google-credentials.json.sample`). |
+| `GMAIL_TOKEN_DIRECTORY` | `token-directory` | Directory where the OAuth access/refresh tokens are stored after authorization. |
+| `GMAIL_SENDER` | `sender` | Email address whose messages are scanned for schedules. |
+| `GMAIL_AUTH_CALLBACK_BASE_URL` | `auth-callback-url` | Base URL used to build the OAuth redirect/callback URL. |
+
+Setup:
+
+1. Create an OAuth client ID (Desktop app) in Google Cloud Console with the Gmail API enabled, download the credentials JSON, and place it at the path referenced by `GMAIL_CREDENTIALS_FILE` (see `secrets/google-credentials.json.sample` for the expected shape).
+2. Start the app, then open `GET /v1/garbage-collection/setup/gmail` in a browser to begin the OAuth consent flow.
+3. After granting access, Google redirects to `/v1/garbage-collection/setup/gmail/callback`, which exchanges the authorization code for tokens and stores them under `GMAIL_TOKEN_DIRECTORY`.
+4. Once authorized, `GmailMessageScheduler` periodically polls the Gmail inbox for new schedule attachments.
 
 ## Run locally
 
