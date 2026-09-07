@@ -9,6 +9,8 @@ Remindly is a Spring Boot service for scheduling reminders and delivering them t
 - PostgreSQL
 - Liquibase
 - ntfy: https://ntfy.sh/
+- caddy: https://caddyserver.com/ (optional reverse proxy with automatic HTTPS)
+- sslip.io: https://sslip.io/ (optional free wildcard DNS service for HTTPS)
 
 ## Requirements
 
@@ -132,8 +134,6 @@ docker-compose --env-file secrets/.env up -d
 
 ## iPhone Shortcuts
 
-Tested only with the PC and iPhone connected to the same LAN.
-
 On Windows, open the application port if the phone cannot reach the PC over LAN:
 
 ```powershell
@@ -147,7 +147,7 @@ New-NetFirewallRule -DisplayName "Allow Docker TCP <APP-PORT>" `
 Use the Shortcuts action **Get Contents of URL**:
 
 1. Add a new shortcut and choose **Get Contents of URL**.
-2. Set the URL to `http://<PC-IP>:<APP-PORT>/v1/adhoc`.
+2. Set the URL to `http://<APP_DOMAIN>/v1/adhoc`. (`http://<PC_IP_ADDRESS>:<APP_PORT>/v1/adhoc` if running locally in same LAN)
 3. Set the method to `POST`.
 4. Set the request body to `JSON`.
 5. Send a payload like this:
@@ -159,7 +159,7 @@ Use the Shortcuts action **Get Contents of URL**:
 }
 ```
 
-## Reverse proxy / HTTPS (production)
+## Reverse proxy / HTTPS
 
 The `caddy` service in `docker-compose.caddy.yml` provides automatic HTTPS via Let's Encrypt and
 proxies traffic to the app. The app itself is no longer published on a host port (`expose: 8080`
