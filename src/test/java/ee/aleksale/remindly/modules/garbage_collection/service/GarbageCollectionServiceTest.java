@@ -19,6 +19,7 @@ import ee.aleksale.remindly.modules.garbage_collection.garbage.dto.GarbageCollec
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
@@ -200,5 +202,57 @@ public class GarbageCollectionServiceTest {
             .findFirst()
             .orElseThrow()
             .getMessage());
+  }
+
+  @Test
+  void shouldNotifyWithFormattedEvents_whenNextEventsFound() {
+    final var firstEvent = EventEntity.builder()
+        .type(EventType.BIO_WASTE_COLLECTION)
+        .scheduledAt(LocalDateTime.of(2026, 8, 25, 10, 0))
+        .message("bio")
+        .build();
+    final var secondEvent = EventEntity.builder()
+        .type(EventType.MIXED_WASTE_COLLECTION)
+        .scheduledAt(LocalDateTime.of(2026, 8, 26, 10, 0))
+        .message("mixed")
+        .build();
+
+    doReturn(List.of(firstEvent, secondEvent))
+        .when(eventRepository)
+        .findAllByTypeInAndScheduledAtAfter(anyList(), any(LocalDateTime.class), any(Pageable.class));
+    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
+
+    garbageCollectionService.notifyNextEvents(2);
+
+    final var messageCaptor = ArgumentCaptor.forClass(String.class);
+    verify(ntfyClient).notification(EventType.GARBAGE_SCHEDULE_FETCHED);
+    verify(ntfyRequestBuilder).withTitle("Next 2 garbage collection events");
+    verify(ntfyRequestBuilder).withMessage(messageCaptor.capture());
+    verify(ntfyRequestBuilder).withDefaultEmojis();
+
+    assertEquals(
+        "BIO_WASTE_COLLECTION: 2026-08-25\nMIXED_WASTE_COLLECTION: 2026-08-26",
+        messageCaptor.getValue());
+  }
+
+  @Test
+  void shouldNotifyNoEventsFound_whenNoNextEventsExist() {
+    doReturn(List.of())
+        .when(eventRepository)
+        .findAllByTypeInAndScheduledAtAfter(anyList(), any(LocalDateTime.class), any(Pageable.class));
+    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
+
+    garbageCollectionService.notifyNextEvents(3);
+
+    verify(ntfyClient).notification(EventType.GARBAGE_SCHEDULE_FETCHED);
+    verify(ntfyRequestBuilder).withTitle("Next 3 garbage collection events");
+    verify(ntfyRequestBuilder).withMessage("No events found");
+    verify(ntfyRequestBuilder).withDefaultEmojis();
   }
 }

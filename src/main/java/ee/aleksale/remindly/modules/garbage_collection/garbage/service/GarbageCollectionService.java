@@ -7,6 +7,9 @@ import ee.aleksale.remindly.core.model.type.EventType;
 import ee.aleksale.remindly.core.repository.EventRepository;
 import ee.aleksale.remindly.modules.garbage_collection.garbage.dto.GarbageCollectionSchedule;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +19,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GarbageCollectionService {
@@ -90,5 +95,40 @@ public class GarbageCollectionService {
       case MIXED -> "Mixed waste collection is scheduled for today.";
       case PACKAGING -> "Packaging waste collection is scheduled for today.";
     };
+  }
+
+  public void notifyNextEvents(int limit) {
+    final var garbageEvents = Arrays.stream(GarbageCollectionSchedule.GarbageType.values())
+            .map(GarbageCollectionSchedule.GarbageType::mapToEventType)
+            .toList();
+
+    final var nextEvents = eventRepository.findAllByTypeInAndScheduledAtAfter(
+            garbageEvents,
+            LocalDateTime.now(),
+            PageRequest.of(0, limit, Sort.by(Sort.Direction.ASC, "scheduledAt")));
+
+    if (nextEvents.isEmpty()) {
+      log.info("No next garbage collection events found");
+
+      ntfyClient.notification(EventType.GARBAGE_SCHEDULE_FETCHED)
+              .withTitle(String.format("Next %d garbage collection events", limit))
+              .withMessage("No events found")
+              .withDefaultEmojis()
+              .send();
+
+      return;
+    }
+
+    ntfyClient.notification(EventType.GARBAGE_SCHEDULE_FETCHED)
+            .withTitle(String.format("Next %d garbage collection events", limit))
+            .withMessage(formatAllEvent(nextEvents))
+            .withDefaultEmojis()
+            .send();
+  }
+
+  private String formatAllEvent(List<EventEntity> event) {
+    return event.stream()
+            .map(e -> String.format("%s: %s", e.getType().name(), e.getScheduledAt().toLocalDate()))
+            .collect(Collectors.joining("\n"));
   }
 }

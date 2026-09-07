@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -59,6 +60,22 @@ public class GarbageCollectionControllerTest {
         .andExpect(status().isBadRequest());
 
     verify(garbageCollectionService, never()).resetAndExtractSchedules(any());
+  }
+
+  @Test
+  void shouldReturn202_andCallServiceWithDefaultLimit_whenLimitNotProvided() throws Exception {
+    mockMvc.perform(get("/v1/garbage-collection"))
+        .andExpect(status().isAccepted());
+
+    verify(garbageCollectionService).notifyNextEvents(3);
+  }
+
+  @Test
+  void shouldReturn202_andCallServiceWithProvidedLimit_whenLimitGiven() throws Exception {
+    mockMvc.perform(get("/v1/garbage-collection").param("limit", "5"))
+        .andExpect(status().isAccepted());
+
+    verify(garbageCollectionService).notifyNextEvents(5);
   }
 
   @TestConfiguration

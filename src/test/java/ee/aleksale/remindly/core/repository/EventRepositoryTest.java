@@ -18,6 +18,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
@@ -80,6 +83,25 @@ class EventRepositoryTest {
             .hasSize(1)
             .extracting(EventEntity::getType)
             .containsExactly(EventType.MIXED_WASTE_COLLECTION);
+  }
+
+  @Test
+  void shouldFindOnlyMatchingTypesScheduledAfterGivenTime_orderedAscending_andLimitedByPageable() {
+    final var now = LocalDateTime.of(2026, 8, 25, 12, 30);
+    eventRepository.save(event(EventType.ADHOC, now.plusMinutes(5), null, "wrong-type"));
+    eventRepository.save(event(EventType.BIO_WASTE_COLLECTION, now.minusMinutes(5), null, "before-now"));
+    final var mixedSoon = eventRepository.save(event(EventType.MIXED_WASTE_COLLECTION, now.plusMinutes(10), null, "mixed-soon"));
+    final var bioLater = eventRepository.save(event(EventType.BIO_WASTE_COLLECTION, now.plusMinutes(20), null, "bio-later"));
+    eventRepository.save(event(EventType.PACKAGING_WASTE_COLLECTION, now.plusMinutes(30), null, "packaging-latest"));
+
+    final var events = eventRepository.findAllByTypeInAndScheduledAtAfter(
+            List.of(EventType.BIO_WASTE_COLLECTION, EventType.MIXED_WASTE_COLLECTION),
+            now,
+            PageRequest.of(0, 2, Sort.by(Sort.Direction.ASC, "scheduledAt")));
+
+    assertThat(events)
+            .extracting(EventEntity::getId)
+            .containsExactly(mixedSoon.getId(), bioLater.getId());
   }
 
   private static EventEntity event(EventType type, LocalDateTime scheduledAt, LocalDateTime sentAt, String message) {

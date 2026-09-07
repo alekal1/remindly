@@ -1,8 +1,9 @@
 package ee.aleksale.remindly.core.repository;
 
 import ee.aleksale.remindly.core.model.domain.EventEntity;
-import jakarta.persistence.LockModeType;
 import ee.aleksale.remindly.core.model.type.EventType;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
@@ -21,5 +22,10 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
   boolean existsByTypeAndScheduledAtBetween(
       EventType type, LocalDateTime scheduledAtStart, LocalDateTime scheduledAtEnd);
+
+  List<EventEntity> findAllByTypeInAndScheduledAtAfter(
+          Collection<EventType> types,
+          LocalDateTime scheduledAtAfter,
+          Pageable pageable);
 
 }
