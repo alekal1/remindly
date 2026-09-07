@@ -159,8 +159,24 @@ Use the Shortcuts action **Get Contents of URL**:
 }
 ```
 
-## Reminder behavior
+## Reverse proxy / HTTPS (production)
 
-Reminders are processed automatically every minute.
+The `caddy` service in `docker-compose.caddy.yml` provides automatic HTTPS via Let's Encrypt and
+proxies traffic to the app. The app itself is no longer published on a host port (`expose: 8080`
+only) — Caddy is the sole entry point on ports 80/443.
 
-When an event becomes due, the app sends the matching ntfy notification and marks the event as sent.
+1. Point a DNS name at your server's public IP. If you don't own a domain, you can use a free
+   wildcard DNS service like [sslip.io](https://sslip.io) (e.g. `remindly.<ip-with-dashes>.sslip.io`).
+2. Set the hostname in `Caddyfile` to match.
+3. Ensure ports 80 and 443 are open (cloud firewall/security list **and** OS firewall, e.g.
+   `iptables`/`firewalld` on Oracle Cloud instances).
+4. Update `APP_EXTERNAL_BASE_URL` and `GMAIL_AUTH_CALLBACK_BASE_URL` in your `.env` file to the
+   `https://` version of that hostname.
+5. Start everything, including Caddy:
+
+```bash
+docker compose -f docker-compose.caddy.yml --env-file secrets/.env up -d
+```
+
+Caddy automatically requests and renews a Let's Encrypt certificate for the configured hostname
+on first startup (requires ports 80/443 reachable from the internet for the ACME challenge).
