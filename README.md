@@ -1,6 +1,12 @@
 # Remindly
 
-Remindly is a Spring Boot service for scheduling reminders and delivering them through ntfy.
+**Self-hosted automation engine for things you don't want to remember.**
+
+Remindly is a Spring Boot service that turns recurring chores and one-off tasks into scheduled
+push notifications, delivered through [ntfy](https://ntfy.sh/). Fire off an ad-hoc reminder from
+your phone via a Shortcut, snooze it if the timing's off, or let Remindly watch your inbox and
+auto-schedule reminders from incoming emails (e.g. garbage collection notices) — all running on
+your own infrastructure, with no third-party reminder app required.
 
 ## Tech stack
 
@@ -101,10 +107,11 @@ Configuration (`app.gmail`):
 
 Setup:
 
-1. Create an OAuth client ID (Desktop app) in Google Cloud Console with the Gmail API enabled, download the credentials JSON, and place it at the path referenced by `GMAIL_CREDENTIALS_FILE` (see `secrets/google-credentials.json.sample` for the expected shape).
-2. Start the app, then open `GET /v1/garbage-collection/setup/gmail` in a browser to begin the OAuth consent flow.
-3. After granting access, Google redirects to `/v1/garbage-collection/setup/gmail/callback`, which exchanges the authorization code for tokens and stores them under `GMAIL_TOKEN_DIRECTORY`.
-4. Once authorized, `GmailMessageScheduler` periodically polls the Gmail inbox for new schedule attachments.
+1. Create an OAuth client ID (Web) in Google Cloud Console with the Gmail API enabled, download the credentials JSON, and place it at the path referenced by `GMAIL_CREDENTIALS_FILE` (see `secrets/google-credentials.json.sample` for the expected shape).
+2. Add authorized url in Google Cloud Console.
+3. Start the app, then open `GET /v1/garbage-collection/setup/gmail` in a browser to begin the OAuth consent flow.
+4. After granting access, Google redirects to `/v1/garbage-collection/setup/gmail/callback`, which exchanges the authorization code for tokens and stores them under `GMAIL_TOKEN_DIRECTORY`.
+5. Once authorized, `GmailMessageScheduler` periodically polls the Gmail inbox for new schedule attachments.
 
 ## Run locally
 
