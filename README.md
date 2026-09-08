@@ -5,8 +5,9 @@
 Remindly is a Spring Boot service that turns recurring chores and one-off tasks into scheduled
 push notifications, delivered through [ntfy](https://ntfy.sh/). Fire off an ad-hoc reminder from
 your phone via a Shortcut, snooze it if the timing's off, or let Remindly watch your inbox and
-auto-schedule reminders from incoming emails (e.g. garbage collection notices) — all running on
-your own infrastructure, with no third-party reminder app required.
+auto-schedule reminders from incoming emails (e.g. garbage collection notices). The app itself
+runs entirely on your own infrastructure — no reminder app or backend required — and ntfy can
+point at the free public `ntfy.sh` service or your own self-hosted ntfy instance.
 
 ## Tech stack
 
