@@ -14,8 +14,9 @@ import ee.aleksale.remindly.core.client.NtfyClient;
 import ee.aleksale.remindly.core.exception.RemindlyException;
 import ee.aleksale.remindly.core.model.domain.EventEntity;
 import ee.aleksale.remindly.core.model.type.EventType;
+import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.repository.EventRepository;
-import ee.aleksale.remindly.modules.garbage_collection.garbage.dto.GarbageCollectionSchedule;
+import ee.aleksale.remindly.modules.garbage_collection.dto.GarbageCollectionSchedule;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -23,8 +24,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import ee.aleksale.remindly.modules.garbage_collection.garbage.service.GarbageCollectionService;
-import ee.aleksale.remindly.modules.garbage_collection.garbage.service.GarbageScheduleExtractorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,18 +82,18 @@ public class GarbageCollectionServiceTest {
 
     doReturn(fileBytes).when(file).getBytes();
     doReturn(schedules).when(garbageScheduleExtractorService).extract(fileBytes);
-    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(ReminderType.class));
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
-    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withEmojis(any());
 
     garbageCollectionService.resetAndExtractSchedules(file);
 
     verify(eventRepository).deleteAllByTypeIn(anyList());
     verify(eventRepository).saveAll(eventListCaptor.capture());
-    verify(ntfyClient).notification(EventType.GARBAGE_SCHEDULE_RESET);
+    verify(ntfyClient).notification(ReminderType.GARBAGE_COLLECTION);
     verify(ntfyRequestBuilder).withMessage(anyString());
-    verify(ntfyRequestBuilder).withDefaultEmojis();
+    verify(ntfyRequestBuilder).withEmojis(any());
 
     final var savedEntities = eventListCaptor.getValue();
     assertEquals(3, savedEntities.size());
@@ -123,10 +122,10 @@ public class GarbageCollectionServiceTest {
 
     doReturn(fileBytes).when(file).getBytes();
     doReturn(schedules).when(garbageScheduleExtractorService).extract(fileBytes);
-    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(ReminderType.class));
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
-    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withEmojis(any());
 
     garbageCollectionService.resetAndExtractSchedules(file);
 
@@ -174,10 +173,10 @@ public class GarbageCollectionServiceTest {
 
     doReturn(fileBytes).when(file).getBytes();
     doReturn(schedules).when(garbageScheduleExtractorService).extract(fileBytes);
-    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(ReminderType.class));
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
-    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withEmojis(any());
 
     garbageCollectionService.resetAndExtractSchedules(file);
 
@@ -220,18 +219,18 @@ public class GarbageCollectionServiceTest {
     doReturn(List.of(firstEvent, secondEvent))
         .when(eventRepository)
         .findAllByTypeInAndScheduledAtAfter(anyList(), any(LocalDateTime.class), any(Pageable.class));
-    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(ReminderType.class));
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
-    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withEmojis(any());
 
     garbageCollectionService.notifyNextEvents(2);
 
     final var messageCaptor = ArgumentCaptor.forClass(String.class);
-    verify(ntfyClient).notification(EventType.GARBAGE_SCHEDULE_FETCHED);
+    verify(ntfyClient).notification(ReminderType.GARBAGE_COLLECTION);
     verify(ntfyRequestBuilder).withTitle("Next 2 garbage collection events");
     verify(ntfyRequestBuilder).withMessage(messageCaptor.capture());
-    verify(ntfyRequestBuilder).withDefaultEmojis();
+    verify(ntfyRequestBuilder).withEmojis(any());
 
     assertEquals(
         "BIO_WASTE_COLLECTION: 2026-08-25\nMIXED_WASTE_COLLECTION: 2026-08-26",
@@ -243,16 +242,16 @@ public class GarbageCollectionServiceTest {
     doReturn(List.of())
         .when(eventRepository)
         .findAllByTypeInAndScheduledAtAfter(anyList(), any(LocalDateTime.class), any(Pageable.class));
-    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(ReminderType.class));
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
-    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withEmojis(any());
 
     garbageCollectionService.notifyNextEvents(3);
 
-    verify(ntfyClient).notification(EventType.GARBAGE_SCHEDULE_FETCHED);
+    verify(ntfyClient).notification(ReminderType.GARBAGE_COLLECTION);
     verify(ntfyRequestBuilder).withTitle("Next 3 garbage collection events");
     verify(ntfyRequestBuilder).withMessage("No events found");
-    verify(ntfyRequestBuilder).withDefaultEmojis();
+    verify(ntfyRequestBuilder).withEmojis(any());
   }
 }

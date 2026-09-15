@@ -18,9 +18,9 @@ class RemindlyAppPropertiesTest {
     final var adhocReminder = reminder("adhoc", "adhoc-topic", true);
     properties.setReminders(List.of(adhocReminder));
 
-    final var reminder = properties.getReminders(ReminderType.ADHOC);
+    final var reminder = properties.getReminderProps(ReminderType.ADHOC);
 
-    assertEquals("adhoc", reminder.getName());
+    assertEquals("adhoc", reminder.getId());
     assertEquals("adhoc-topic", reminder.getTopic());
     assertTrue(reminder.isEnabled());
   }
@@ -32,15 +32,15 @@ class RemindlyAppPropertiesTest {
 
     final var exception = assertThrows(
             RemindlyException.class,
-            () -> properties.getReminders(ReminderType.ERRORS)
+            () -> properties.getReminderProps(ReminderType.ERRORS)
     );
 
     assertEquals("Notification configuration not found for type: ERRORS", exception.getMessage());
   }
 
-  private static RemindlyAppProperties.ReminderProperties reminder(String name, String topic, boolean enabled) {
+  private static RemindlyAppProperties.ReminderProperties reminder(String id, String topic, boolean enabled) {
     final var reminder = new RemindlyAppProperties.ReminderProperties();
-    reminder.setName(name);
+    reminder.setId(id);
     reminder.setTopic(topic);
     reminder.setEnabled(enabled);
     return reminder;

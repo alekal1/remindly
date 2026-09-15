@@ -17,9 +17,9 @@ public class RemindlyAppProperties {
     private String ntfyServer;
     private List<ReminderProperties> reminders;
 
-    public ReminderProperties getReminders(ReminderType reminderType) {
+    public ReminderProperties getReminderProps(ReminderType reminderType) {
         final var reminder = reminders.stream()
-                .filter(n -> n.getName().equals(reminderType.getConfigKey()))
+                .filter(n -> n.getId().equals(reminderType.getId()))
                 .findFirst();
 
         if (reminder.isEmpty()) {
@@ -31,7 +31,7 @@ public class RemindlyAppProperties {
     @Getter
     @Setter
     public static class ReminderProperties {
-        private String name;
+        private String id;
         private String topic;
         private boolean enabled;
     }

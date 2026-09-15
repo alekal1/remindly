@@ -3,6 +3,7 @@ package ee.aleksale.remindly.core.exception;
 import ee.aleksale.remindly.core.client.NtfyClient;
 import ee.aleksale.remindly.core.model.type.EventType;
 import ee.aleksale.remindly.core.model.type.ReminderType;
+import ee.aleksale.remindly.utils.EmojiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,10 +29,10 @@ public class GlobalExceptionHandler {
   public void handleException(Exception exception) {
     log.error("Unhandled exception during request processing", exception);
 
-    ntfyClient.notification(EventType.REMINDLY_APP_ERROR)
-            .withTitle(ReminderType.ERRORS.name())
+    ntfyClient.notification(ReminderType.ERRORS)
+            .withTitle(EventType.REMINDLY_APP_ERROR.name())
             .withMessage(exception.getMessage())
-            .withDefaultEmojis()
+            .withEmojis(EmojiUtils.getEmojisForEventType(EventType.REMINDLY_APP_ERROR))
             .send();
   }
 }

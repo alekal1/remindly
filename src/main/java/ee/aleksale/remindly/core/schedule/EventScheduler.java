@@ -7,11 +7,11 @@ import ee.aleksale.remindly.core.model.dto.NtfyAction;
 import ee.aleksale.remindly.core.property.RemindlyAppProperties;
 import ee.aleksale.remindly.core.repository.EventRepository;
 import ee.aleksale.remindly.modules.snooze.dto.Snooze;
+import ee.aleksale.remindly.utils.EmojiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,10 +43,10 @@ public class EventScheduler {
     log.info("Found {} due events", dueEvents.size());
 
     for (var event : dueEvents) {
-      ntfyClient.notification(event.getType())
+      ntfyClient.notification(event.getType().getReminderType())
               .withTitle(event.getType().getReminderType().name())
               .withMessage(event.getMessage())
-              .withDefaultEmojis()
+              .withEmojis(EmojiUtils.getEmojisForEventType(event.getType()))
               .withActions(actions(event))
               .send();
 

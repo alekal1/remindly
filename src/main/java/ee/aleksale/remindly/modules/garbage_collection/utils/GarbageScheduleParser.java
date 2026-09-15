@@ -1,6 +1,6 @@
 package ee.aleksale.remindly.modules.garbage_collection.utils;
 
-import ee.aleksale.remindly.modules.garbage_collection.garbage.dto.GarbageCollectionSchedule;
+import ee.aleksale.remindly.modules.garbage_collection.dto.GarbageCollectionSchedule;
 import lombok.experimental.UtilityClass;
 
 import java.time.LocalDate;
@@ -17,7 +17,7 @@ public class GarbageScheduleParser {
           DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
   private static final Pattern HEADER_PATTERN = Pattern.compile(
-          "^(.+?)\\s*\\|\\s*([0-9.]+m3)\\s+(.+?)\\s+-\\s+\\d+tk$",
+          "^.*m3.*(?:\\R(?!\\d{2}\\.\\d{2}\\.\\d{4}).*)?",
           Pattern.MULTILINE
   );
 
@@ -32,7 +32,7 @@ public class GarbageScheduleParser {
     for (int i = 0; i < headers.size(); i++) {
       var header = headers.get(i);
       var block = extractBlockBetweenHeaders(text, headers, i);
-      var type = GarbageCollectionSchedule.GarbageType.mapFromString(header.group(3));
+      var type = GarbageCollectionSchedule.GarbageType.mapFromString(extractType(header.group()));
       var dates = extractDatesFromBlock(block);
 
       result.add(GarbageCollectionSchedule.builder()
@@ -61,6 +61,20 @@ public class GarbageScheduleParser {
     }
 
     return dates;
+  }
+
+  private static String extractType(String header) {
+    if (header.contains("|")) {
+      return header
+              .replaceFirst("^.*\\|\\s*[\\d.]+m3\\s+", "")
+              .replaceFirst("\\s+-\\s+\\d+tk$", "")
+              .trim();
+    }
+
+    return header
+            .replaceFirst("^.*m3\\s+plastikkonteiner,\\s*", "")
+            .replaceAll("\\s+", " ")
+            .trim();
   }
 
   private ArrayList<MatchResult> collectHeader(String text) {

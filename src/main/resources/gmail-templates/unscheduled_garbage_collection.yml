@@ -1,0 +1,11 @@
+id: unscheduled_garbage_collection_email_template
+sender: "${UNSCHEDULED_GARBAGE_COLLECTION_SENDER}"
+reminderId: garbage-collection
+subjectContains: "jäätmemahuti"
+selector:
+  table:
+    anchor: "table:has(th:matchesOwn(^\\s*Jäätmeliik\\s*$))"
+    columns:
+      type: 'Jäätmeliik'
+      date: "Tühjendamise kuupäev"
+    dateFormat: "dd.MM.yyyy"

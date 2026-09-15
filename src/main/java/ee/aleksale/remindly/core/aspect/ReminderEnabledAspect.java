@@ -21,7 +21,7 @@ public class ReminderEnabledAspect {
     public void checkReminderEnabled(ReminderEnabled reminderEnabled) {
         log.info("Checking reminder enabled: {}", reminderEnabled);
 
-        final var reminder = properties.getReminders(reminderEnabled.type());
+        final var reminder = properties.getReminderProps(reminderEnabled.type());
 
         if (!reminder.isEnabled()) {
             throw new RemindlyException("Reminder '" + reminderEnabled.type() + "' is disabled.");

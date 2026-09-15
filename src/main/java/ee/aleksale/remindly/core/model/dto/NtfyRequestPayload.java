@@ -1,11 +1,11 @@
 package ee.aleksale.remindly.core.model.dto;
 
-import ee.aleksale.remindly.core.model.type.EventType;
+import ee.aleksale.remindly.core.model.type.ReminderType;
 
 import java.util.List;
 
 public record NtfyRequestPayload(
-        EventType eventType,
+        ReminderType reminderType,
         String title,
         String message,
         List<NtfyAction> ntfyActions,

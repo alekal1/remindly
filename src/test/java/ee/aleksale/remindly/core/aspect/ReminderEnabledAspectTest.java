@@ -30,7 +30,7 @@ class ReminderEnabledAspectTest {
   @Test
   void shouldProceed_whenReminderIsEnabled() {
     final var reminder = reminder(true);
-    doReturn(reminder).when(properties).getReminders(ReminderType.ADHOC);
+    doReturn(reminder).when(properties).getReminderProps(ReminderType.ADHOC);
 
     assertDoesNotThrow(() -> reminderEnabledAspect.checkReminderEnabled(annotation(ReminderType.ADHOC)));
   }
@@ -38,7 +38,7 @@ class ReminderEnabledAspectTest {
   @Test
   void shouldThrow_whenReminderIsDisabled() {
     final var reminder = reminder(false);
-    doReturn(reminder).when(properties).getReminders(ReminderType.GARBAGE_COLLECTION);
+    doReturn(reminder).when(properties).getReminderProps(ReminderType.GARBAGE_COLLECTION);
 
     final var exception = assertThrows(
             RemindlyException.class,

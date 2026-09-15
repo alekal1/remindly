@@ -26,6 +26,10 @@ public class EmojiUtils {
   public static final String PUSHPIN = "pushpin "; // 📌
   public static final String ENVELOPE_WITH_ARROW = "envelope_with_arrow"; // 📩
 
+  public static final String INBOX_TRAY = "inbox_tray"; // 📥
+  public static final String EMAIL = "email"; // 📧
+
+
   public static List<String> getEmojisForEventType(EventType eventType) {
     return switch (eventType) {
       case BIO_WASTE_COLLECTION -> List.of(SEEDLING, LEAVES);
@@ -36,7 +40,6 @@ public class EmojiUtils {
       case ADHOC -> List.of(MEMO, BELL);
       case SNOOZE -> List.of(PUSHPIN, MEMO, BELL);
       case REMINDLY_APP_ERROR -> List.of(ROTATING_LIGHT);
-      default -> List.of(PUSHPIN);
     };
   }
 

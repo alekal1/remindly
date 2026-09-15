@@ -6,6 +6,7 @@ import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.repository.EventRepository;
 import ee.aleksale.remindly.modules.adhoc.dto.Adhoc;
 import ee.aleksale.remindly.modules.adhoc.dto.mapper.AdhocMapper;
+import ee.aleksale.remindly.utils.EmojiUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +24,11 @@ public class AdhocService {
 
     eventRepository.saveAndFlush(entity);
 
-    ntfyClient.notification(EventType.ADHOC)
+    ntfyClient.notification(ReminderType.ADHOC)
               .withTitle(ReminderType.ADHOC.name())
               .withMessage(String.format("Reminder for '%s' is scheduled at %s",
                       entity.getMessage(), entity.getScheduledAt()))
-              .withDefaultEmojis()
+              .withEmojis(EmojiUtils.getEmojisForEventType(EventType.ADHOC))
               .send();
   }
 }

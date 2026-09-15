@@ -24,20 +24,19 @@ management:
         include: health,info
 
 app:
-  externalBaseUrl: ${APP_EXTERNAL_BASE_URL}
+  external-base-url: ${APP_EXTERNAL_BASE_URL}
   ntfy-server: ${NTFY_SERVER_URL}
   reminders:
-    - name: errors
+    - id: errors
       topic: ${NTFY_ERRORS_TOPIC}
       enabled: ${NTFY_ERRORS_TOPIC_ENABLED}
-    - name: garbage-collection
+    - id: garbage-collection
       topic: ${NTFY_GARBAGE_COLLECTION_TOPIC}
       enabled: ${NTFY_GARBAGE_COLLECTION_TOPIC_ENABLED}
-    - name: adhoc
+    - id: adhoc
       topic: ${NTFY_ADHOC_TOPIC}
       enabled: ${NTFY_ADHOC_TOPIC_ENABLED}
   gmail:
     credentials-file: ${GMAIL_CREDENTIALS_FILE}
     token-directory: ${GMAIL_TOKEN_DIRECTORY}
-    sender: ${GMAIL_SENDER}
     auth-callback-url: ${GMAIL_AUTH_CALLBACK_BASE_URL}

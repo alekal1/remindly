@@ -3,10 +3,9 @@ package ee.aleksale.remindly.core.client;
 import ee.aleksale.remindly.core.exception.RemindlyException;
 import ee.aleksale.remindly.core.model.dto.NtfyAction;
 import ee.aleksale.remindly.core.model.dto.NtfyRequestPayload;
-import ee.aleksale.remindly.core.model.type.EventType;
+import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.property.RemindlyAppProperties;
 import ee.aleksale.remindly.core.service.NtfyHeaderService;
-import ee.aleksale.remindly.utils.EmojiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
@@ -29,12 +28,11 @@ public class NtfyClient {
   }
 
   private void sendNotification(NtfyRequestPayload payload) {
-    final var eventType = payload.eventType();
-    final var reminderType = eventType.getReminderType();
-    final var reminder = property.getReminders(reminderType);
+    final var type = payload.reminderType();
+    final var reminder = property.getReminderProps(type);
 
     if (!reminder.isEnabled()) {
-      throw new RemindlyException("Notification for event type " + eventType + " is disabled.");
+      throw new RemindlyException("Notification for event type " + type + " is disabled.");
     }
 
     var headers = ntfyHeaderService.getHeaders(payload);
@@ -48,24 +46,25 @@ public class NtfyClient {
     );
   }
 
-  public NtfyRequestBuilder notification(EventType eventType) {
-    return new NtfyRequestBuilder(this, eventType);
+  public NtfyRequestBuilder notification(ReminderType reminderType) {
+    return new NtfyRequestBuilder(this, reminderType);
   }
 
   public static class NtfyRequestBuilder {
 
     private final NtfyClient client;
-    private final EventType eventType;
+    private final ReminderType reminderType;
 
     private String title;
     private String message;
     private List<String> emojis;
     private List<NtfyAction> ntfyActions;
 
-    private NtfyRequestBuilder(NtfyClient client, EventType eventType) {
+    private NtfyRequestBuilder(NtfyClient client, ReminderType reminderType) {
       this.client = client;
-      this.eventType = eventType;
+      this.reminderType = reminderType;
     }
+
 
     public NtfyRequestBuilder withTitle(String title) {
       this.title = title;
@@ -74,11 +73,6 @@ public class NtfyClient {
 
     public NtfyRequestBuilder withMessage(String message) {
       this.message = message;
-      return this;
-    }
-
-    public NtfyRequestBuilder withDefaultEmojis() {
-      this.emojis = EmojiUtils.getEmojisForEventType(eventType);
       return this;
     }
 
@@ -99,7 +93,7 @@ public class NtfyClient {
 
     public void send() {
       client.sendNotification(new NtfyRequestPayload(
-              eventType,
+              reminderType,
               title,
               message,
               ntfyActions,

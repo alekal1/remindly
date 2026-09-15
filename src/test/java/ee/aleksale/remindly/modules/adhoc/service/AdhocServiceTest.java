@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import ee.aleksale.remindly.core.client.NtfyClient;
 import ee.aleksale.remindly.core.model.domain.EventEntity;
 import ee.aleksale.remindly.core.model.type.EventType;
+import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.repository.EventRepository;
 import ee.aleksale.remindly.modules.adhoc.dto.Adhoc;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,15 +45,15 @@ public class AdhocServiceTest {
   void shouldMapAdhocToEventEntity_whenAdhocIsCalled() {
     final var dto = Adhoc.builder().message("test").build();
 
-    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(ReminderType.class));
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
-    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withEmojis(any());
 
     adhocService.adhoc(dto);
 
     verify(eventRepository).saveAndFlush(eventCaptor.capture());
-    verify(ntfyClient).notification(eventCaptor.getValue().getType());
+    verify(ntfyClient).notification(eventCaptor.getValue().getType().getReminderType());
 
     final var savedEntity = eventCaptor.getValue();
     assertEquals(EventType.ADHOC, savedEntity.getType());

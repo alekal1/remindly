@@ -13,6 +13,7 @@ import ee.aleksale.remindly.core.client.NtfyClient;
 import ee.aleksale.remindly.core.exception.RemindlyException;
 import ee.aleksale.remindly.core.model.domain.EventEntity;
 import ee.aleksale.remindly.core.model.type.EventType;
+import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.repository.EventRepository;
 import ee.aleksale.remindly.modules.snooze.dto.Snooze;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +62,7 @@ public class SnoozeServiceTest {
         .build();
 
     doReturn(Optional.of(parentEvent)).when(eventRepository).findById(1L);
-    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(ReminderType.class));
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withEmojis(any());
@@ -69,7 +70,7 @@ public class SnoozeServiceTest {
     snoozeService.snoozeEvent(request);
 
     verify(eventRepository).save(eventCaptor.capture());
-    verify(ntfyClient).notification(EventType.SNOOZE);
+    verify(ntfyClient).notification(ReminderType.ADHOC);
     verify(ntfyRequestBuilder).withTitle(EventType.SNOOZE.name());
     verify(ntfyRequestBuilder).withMessage(
         String.format("Reminder for '%s' is snoozed to %s", "parent message", newScheduledAt));

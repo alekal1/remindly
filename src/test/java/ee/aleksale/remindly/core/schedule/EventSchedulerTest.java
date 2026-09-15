@@ -1,6 +1,7 @@
 package ee.aleksale.remindly.core.schedule;
 
 import ee.aleksale.remindly.core.client.NtfyClient;
+import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.property.RemindlyAppProperties;
 import ee.aleksale.remindly.core.model.domain.EventEntity;
 import ee.aleksale.remindly.core.model.type.EventType;
@@ -58,10 +59,10 @@ class EventSchedulerTest {
     doReturn(List.of(event), List.of())
             .when(eventRepository)
             .findAllBySentAtIsNullAndScheduledAtLessThanEqual(dueAt);
-    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(EventType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(ReminderType.class));
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
-    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withDefaultEmojis();
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withEmojis(any());
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withActions(anyList());
     doReturn("https://example.com").when(properties).getExternalBaseUrl();
 

@@ -24,7 +24,7 @@ public class RemindersInfoContributor implements InfoContributor {
             .orElse(List.of())
             .stream()
             .map(reminder -> Map.of(
-                    "name", reminder.getName(),
+                    "id", reminder.getId(),
                     "topic", reminder.getTopic(),
                     "enabled", reminder.isEnabled()
             ))

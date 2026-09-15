@@ -4,6 +4,7 @@ import ee.aleksale.remindly.core.client.NtfyClient;
 import ee.aleksale.remindly.core.exception.RemindlyException;
 import ee.aleksale.remindly.core.model.domain.EventEntity;
 import ee.aleksale.remindly.core.model.type.EventType;
+import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.repository.EventRepository;
 import ee.aleksale.remindly.modules.snooze.dto.Snooze;
 import ee.aleksale.remindly.utils.EmojiUtils;
@@ -33,7 +34,7 @@ public class SnoozeService {
 
     eventRepository.save(snoozedEvent);
 
-    ntfyClient.notification(EventType.SNOOZE)
+    ntfyClient.notification(ReminderType.ADHOC)
             .withTitle(EventType.SNOOZE.name())
             .withMessage(String.format("Reminder for '%s' is snoozed to %s",
                     parentEvent.getMessage(), snoozedEvent.getScheduledAt()))

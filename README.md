@@ -24,54 +24,68 @@ point at the free public `ntfy.sh` service or your own self-hosted ntfy instance
 - Java 25
 - Docker and Docker Compose
 - ntfy topics for the reminder types
+- .env file with configuration (see below)
 
 ## Modules
 
-- `core` - shared domain, persistence, ntfy client, scheduler, and reminder guards.
-- `adhoc` - creates one-off reminders through `POST /v1/adhoc`.
-- `garbage_collection` - imports garbage collection schedules and converts them into reminders. Contains two submodules:
-  - `garbage` - parses garbage collection schedule PDFs and creates reminder events.
-  - `gmail` - fetches the schedule PDF as a Gmail attachment via the Gmail API and hands it off to `garbage` for processing.
+- `core` - Shared domain, persistence, ntfy client, scheduler, and reminder guards.
+- `adhoc` - Creates one-off reminders through `POST /v1/adhoc`.
+- `garbage_collection` - Imports garbage collection schedules and converts them into reminders.
 - `snooze` - Snooze functionality for reminders
+- `gmail` - Fetches gmail email content based on templates and creates reminder for each.
+
 
 ## Configuration
 
 The app reads environment variables from `.env` at startup.
 
-By default, the ntfy server is `https://ntfy.sh`. You can override this by setting the `NTFY_SERVER` environment variable.
+| Env variable | Property | Description | Default |
+|---|---|---|---|
+| `APP_EXTERNAL_BASE_URL` | `external-base-url` | Base URL of the application, used for building callback URLs. | - |
+| `NTFY_SERVER_URL` | `ntfy-server` | URL of the ntfy server. | https://ntfy.sh |
+| `NTFY_ERRORS_TOPIC` | `reminders.topic` | Topic for error notifications. | - |
+| `NTFY_ERRORS_TOPIC_ENABLED` | `reminders.enabled` | Whether the error notifications reminder is enabled. | true |
+| `NTFY_GARBAGE_COLLECTION_TOPIC` | `reminders.topic` | Topic for garbage collection notifications. | - |
+| `NTFY_GARBAGE_COLLECTION_TOPIC_ENABLED` | `reminders.enabled` | Whether the garbage collection notifications reminder is enabled. | false |
+| `NTFY_ADHOC_TOPIC` | `reminders.topic` | Topic for adhoc notifications. | - |
+| `NTFY_ADHOC_TOPIC_ENABLED` | `reminders.enabled` | Whether the adhoc notifications reminder is enabled. | true |
+| `GMAIL_CREDENTIALS_FILE` | `credentials-file` | Path to the Google OAuth client credentials JSON. | /secrets/google-credentials.json |
+| `GMAIL_TOKEN_DIRECTORY` | `token-directory` | Directory where the OAuth access/refresh tokens are stored after authorization. | /app/data/gmail |
+| `GMAIL_AUTH_CALLBACK_BASE_URL` | `auth-callback-url` | Base URL used to build the OAuth redirect/callback URL. | http://localhost:9999 |
 
-NTFY topics are only needed for the reminder types that are enabled in `app.reminders`:
+**Some of env variables are prefilled with default values, and some of the are optional** and only needed if you want to enable the corresponding feature.
+(See the [Gmail integration](#gmail-integration) section for details.)
 
-- `NTFY_ERRORS_TOPIC`
-- `NTFY_GARBAGE_COLLECTION_TOPIC`
-- `NTFY_ADHOC_TOPIC`
-
-**It is highly recommended to keep the `errors` reminder enabled, because app exceptions are reported through this channel.**
-
-Example reminder config:
+Reminder config is stored in the `app.reminders` list, which is resolved from the environment variables above. The:
 
 ```yaml
 app:
-  reminders:
-    - name: errors
-      topic: ${NTFY_ERRORS_TOPIC}
-      enabled: true
-    - name: garbage-collection
-      topic: ${NTFY_GARBAGE_COLLECTION_TOPIC}
-      enabled: true
-    - name: adhoc
-      topic: ${NTFY_ADHOC_TOPIC}
-      enabled: true
+   external-base-url: ${APP_EXTERNAL_BASE_URL}
+   ntfy-server: ${NTFY_SERVER_URL}
+   reminders:
+      - id: errors
+        topic: ${NTFY_ERRORS_TOPIC}
+        enabled: ${NTFY_ERRORS_TOPIC_ENABLED}
+      - id: garbage-collection
+        topic: ${NTFY_GARBAGE_COLLECTION_TOPIC}
+        enabled: ${NTFY_GARBAGE_COLLECTION_TOPIC_ENABLED}
+      - id: adhoc
+        topic: ${NTFY_ADHOC_TOPIC}
+        enabled: ${NTFY_ADHOC_TOPIC_ENABLED}
+   gmail:
+      credentials-file: ${GMAIL_CREDENTIALS_FILE}
+      token-directory: ${GMAIL_TOKEN_DIRECTORY}
+      auth-callback-url: ${GMAIL_AUTH_CALLBACK_BASE_URL}
 ```
 
-Reminder configuration is also exposed through Spring Actuator at `GET /actuator/info` under:
+Reminder topic configuration is also exposed through Spring Actuator at `GET /actuator/info` under:
 
 ```json
 {
   "app": {
     "reminders": [
       {
-        "name": "errors",
+        "id": "errors",
         "topic": "..."
       }
     ]
@@ -88,51 +102,26 @@ Database defaults:
 
 ## Gmail integration
 
-**Note:** this integration is very specific to one waste collection provider's notification email.
-`GmailHtmlExtractor` parses the HTML body of the message looking for a table with the exact Estonian column headers
-`Jäätmeliik` (waste type) and `Tühjendamise kuupäev` (collection date).
-Any other email format/structure will not be recognized and will simply produce no schedule.
+The `gmail` submodule reads structured data from Gmail messages using the Gmail API.
 
-The `gmail` submodule reads garbage collection schedules from Gmail messages using the Gmail API. 
+The integration is template-based: every supported email format is described by a YAML template under
+`src/main/resources/gmail-templates/*.yml`. At startup, the app loads all templates from that directory,
+resolves environment variable placeholders in them, and uses the templates to search and process matching
+Gmail messages.
 
-**It is optional and only activates when a valid credentials file is configured.**
+**Currently only table-based email content is supported.** This means a Gmail template can process an email
+when the relevant data is available in an HTML table. The template defines how to find that table, which
+columns should be read, and how the extracted values should be interpreted by the matching processor.
 
-Configuration (`app.gmail`):
-
-| Env variable | Property | Description |
-|---|---|---|
-| `GMAIL_CREDENTIALS_FILE` | `credentials-file` | Path to the Google OAuth client credentials JSON (see `secrets/google-credentials.json.sample`). |
-| `GMAIL_TOKEN_DIRECTORY` | `token-directory` | Directory where the OAuth access/refresh tokens are stored after authorization. |
-| `GMAIL_SENDER` | `sender` | Email address whose messages are scanned for schedules. |
-| `GMAIL_AUTH_CALLBACK_BASE_URL` | `auth-callback-url` | Base URL used to build the OAuth redirect/callback URL. |
+**It is optional and only activates when a valid credentials file setup is provided.**
 
 Setup:
 
 1. Create an OAuth client ID (Web) in Google Cloud Console with the Gmail API enabled, download the credentials JSON, and place it at the path referenced by `GMAIL_CREDENTIALS_FILE` (see `secrets/google-credentials.json.sample` for the expected shape).
 2. Add authorized url in Google Cloud Console.
-3. Start the app, then open `GET /v1/garbage-collection/setup/gmail` in a browser to begin the OAuth consent flow.
-4. After granting access, Google redirects to `/v1/garbage-collection/setup/gmail/callback`, which exchanges the authorization code for tokens and stores them under `GMAIL_TOKEN_DIRECTORY`.
+3. Start the app, then open `GET /v1/gmail/setup"` in a browser to begin the OAuth consent flow.
+4. After granting access, Google redirects to `/v1/gmail/setup/callback`, which exchanges the authorization code for tokens and stores them under `GMAIL_TOKEN_DIRECTORY`.
 5. Once authorized, `GmailMessageScheduler` periodically polls the Gmail inbox for new schedule attachments.
-
-## Run locally
-
-1. Start PostgreSQL:
-
-```bash
-docker compose up -d postgres-remindly
-```
-
-2. Run the application:
-
-```bash
-./gradlew bootRun
-```
-
-On Windows:
-
-```powershell
-.\gradlew.bat bootRun
-```
 
 ## Run with Docker
 

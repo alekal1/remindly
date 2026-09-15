@@ -1,8 +1,16 @@
 package ee.aleksale.remindly.core.client;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 import ee.aleksale.remindly.core.exception.RemindlyException;
 import ee.aleksale.remindly.core.model.dto.NtfyAction;
-import ee.aleksale.remindly.core.model.type.EventType;
 import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.property.RemindlyAppProperties;
 import ee.aleksale.remindly.core.service.NtfyHeaderService;
@@ -17,15 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class NtfyClientTest {
@@ -50,12 +49,12 @@ class NtfyClientTest {
     final var requestCaptor = ArgumentCaptor.forClass(HttpEntity.class);
 
     doReturn("http://ntfy.sh").when(properties).getNtfyServer();
-    doReturn(reminder).when(properties).getReminders(ReminderType.ADHOC);
+    doReturn(reminder).when(properties).getReminderProps(ReminderType.ADHOC);
     doReturn(ResponseEntity.ok().build())
             .when(restTemplate)
             .postForEntity(anyString(), any(HttpEntity.class), any(Class.class));
 
-    ntfyClient.notification(EventType.ADHOC)
+    ntfyClient.notification(ReminderType.ADHOC)
             .withTitle("ADHOC")
             .withMessage("test message")
             .withEmojis(List.of("memo", "bell"))
@@ -75,12 +74,12 @@ class NtfyClientTest {
      final var requestCaptor = ArgumentCaptor.forClass(HttpEntity.class);
 
      doReturn("http://ntfy.sh").when(properties).getNtfyServer();
-     doReturn(reminder).when(properties).getReminders(ReminderType.ADHOC);
+     doReturn(reminder).when(properties).getReminderProps(ReminderType.ADHOC);
      doReturn(ResponseEntity.ok().build())
              .when(restTemplate)
              .postForEntity(anyString(), any(HttpEntity.class), any(Class.class));
 
-     ntfyClient.notification(EventType.ADHOC)
+     ntfyClient.notification(ReminderType.ADHOC)
              .withMessage("test message")
              .withAction(NtfyAction.builder()
                      .action(NtfyAction.NtfyActionType.HTTP)
@@ -102,11 +101,11 @@ class NtfyClientTest {
   @Test
   void shouldThrow_whenReminderIsDisabled() {
     final var reminder = reminder("adhoc", "topic-adhoc", false);
-    doReturn(reminder).when(properties).getReminders(ReminderType.ADHOC);
+    doReturn(reminder).when(properties).getReminderProps(ReminderType.ADHOC);
 
     final var exception = assertThrows(
             RemindlyException.class,
-            () -> ntfyClient.notification(EventType.ADHOC).withMessage("test").withEmojis(List.of("memo")).send()
+            () -> ntfyClient.notification(ReminderType.ADHOC).withMessage("test").withEmojis(List.of("memo")).send()
     );
 
     assertEquals("Notification for event type ADHOC is disabled.", exception.getMessage());
@@ -115,7 +114,7 @@ class NtfyClientTest {
 
   private static RemindlyAppProperties.ReminderProperties reminder(String name, String topic, boolean enabled) {
     final var reminder = new RemindlyAppProperties.ReminderProperties();
-    reminder.setName(name);
+    reminder.setId(name);
     reminder.setTopic(topic);
     reminder.setEnabled(enabled);
     return reminder;
