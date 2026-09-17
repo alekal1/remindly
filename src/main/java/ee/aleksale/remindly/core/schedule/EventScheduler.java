@@ -40,9 +40,10 @@ public class EventScheduler {
     final var now = LocalDateTime.now(clock).truncatedTo(ChronoUnit.MINUTES);
 
     final var dueEvents = eventRepository.findAllBySentAtIsNullAndScheduledAtLessThanEqual(now);
-    log.info("Found {} due events", dueEvents.size());
 
     for (var event : dueEvents) {
+      log.info("Processing event: type :{}; scheduled at: {}", event.getType(), event.getScheduledAt());
+
       ntfyClient.notification(event.getType().getReminderType())
               .withTitle(event.getType().getReminderType().name())
               .withMessage(event.getMessage())
