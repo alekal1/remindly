@@ -27,6 +27,7 @@ public class GmailOAuthService {
     return gmailFlow.map(googleAuthorizationCodeFlow -> googleAuthorizationCodeFlow.newAuthorizationUrl()
             .setRedirectUri(callbackUrl())
             .setAccessType(OFFLINE_ACCESS)
+            .set("prompt", "consent")
             .build())
             .orElse(null);
 
@@ -61,6 +62,14 @@ public class GmailOAuthService {
     }
 
     return gmailFlow.get().loadCredential(USER_ID);
+  }
+
+  public void clearCredential() throws IOException {
+    if (gmailFlow.isEmpty() || gmailFlow.get().getCredentialDataStore() == null) {
+      return;
+    }
+
+    gmailFlow.get().getCredentialDataStore().delete(USER_ID);
   }
 
   private String callbackUrl() {

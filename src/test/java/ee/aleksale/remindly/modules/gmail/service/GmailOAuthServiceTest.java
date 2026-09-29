@@ -1,6 +1,7 @@
 package ee.aleksale.remindly.modules.gmail.service;
 
 import static ee.aleksale.remindly.modules.gmail.config.GmailConfiguration.USER_ID;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -11,10 +12,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.StoredCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.util.store.DataStore;
 import ee.aleksale.remindly.core.constants.ApiConstants;
 import ee.aleksale.remindly.modules.gmail.property.GmailProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +51,7 @@ class GmailOAuthServiceTest {
     doReturn(authorizationUrl).when(gmailFlow).newAuthorizationUrl();
     doReturn(authorizationUrl).when(authorizationUrl).setRedirectUri(CALLBACK_URL);
     doReturn(authorizationUrl).when(authorizationUrl).setAccessType("offline");
+    doReturn(authorizationUrl).when(authorizationUrl).set("prompt", "consent");
     doReturn("https://accounts.google.com/o/oauth2/auth").when(authorizationUrl).build();
 
     final var result = gmailOAuthService.authorizationUrl();
@@ -56,6 +60,7 @@ class GmailOAuthServiceTest {
     verify(gmailFlow).newAuthorizationUrl();
     verify(authorizationUrl).setRedirectUri(CALLBACK_URL);
     verify(authorizationUrl).setAccessType("offline");
+    verify(authorizationUrl).set("prompt", "consent");
   }
 
   @Test
@@ -110,5 +115,25 @@ class GmailOAuthServiceTest {
     final var gmailOAuthService = new GmailOAuthService(Optional.empty(), properties);
 
     assertNull(gmailOAuthService.getCredential());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void shouldDeleteStoredCredential_whenClearingCredential() throws IOException {
+    final var dataStore = (DataStore<StoredCredential>) mock(DataStore.class);
+    final var gmailOAuthService = new GmailOAuthService(Optional.of(gmailFlow), properties);
+
+    doReturn(dataStore).when(gmailFlow).getCredentialDataStore();
+
+    gmailOAuthService.clearCredential();
+
+    verify(dataStore).delete(USER_ID);
+  }
+
+  @Test
+  void shouldNotFail_whenClearingCredentialAndFlowIsMissing() {
+    final var gmailOAuthService = new GmailOAuthService(Optional.empty(), properties);
+
+    assertDoesNotThrow(gmailOAuthService::clearCredential);
   }
 }
