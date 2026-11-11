@@ -12,12 +12,16 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SnoozeService {
 
+  private final Clock clock;
   private final EventRepository eventRepository;
   private final NtfyClient ntfyClient;
 
@@ -27,7 +31,9 @@ public class SnoozeService {
             .orElseThrow(() -> new RemindlyException("No parentEvent found with id: " + request.getParentEventId()));
 
     var snoozedEvent = new EventEntity();
-    snoozedEvent.setScheduledAt(request.getNewScheduledAt());
+    snoozedEvent.setScheduledAt(LocalDateTime.now(clock)
+            .truncatedTo(ChronoUnit.MINUTES)
+            .plusMinutes(request.getSnoozeMinutes()));
     snoozedEvent.setType(EventType.SNOOZE);
     snoozedEvent.setMessage(parentEvent.getMessage());
     snoozedEvent.setParentEvent(parentEvent);

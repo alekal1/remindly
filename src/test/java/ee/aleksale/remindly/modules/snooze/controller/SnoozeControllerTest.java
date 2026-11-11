@@ -21,7 +21,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
-import java.time.LocalDateTime;
 
 @WebMvcTest(SnoozeController.class)
 @Import(SnoozeControllerTest.SnoozeControllerConfiguration.class)
@@ -38,7 +37,7 @@ public class SnoozeControllerTest {
   @Test
   void shouldReturn400_whenParentEventIdMissing() throws Exception {
     final var request = Snooze.builder()
-        .newScheduledAt(LocalDateTime.now())
+        .snoozeMinutes(60)
         .build();
 
     mockMvc.perform(post("/v1/snooze")
@@ -50,9 +49,24 @@ public class SnoozeControllerTest {
   }
 
   @Test
-  void shouldReturn400_whenNewScheduledAtMissing() throws Exception {
+  void shouldReturn400_whenSnoozeMinutesMissing() throws Exception {
     final var request = Snooze.builder()
         .parentEventId(1L)
+        .build();
+
+    mockMvc.perform(post("/v1/snooze")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest());
+
+    verify(snoozeService, never()).snoozeEvent(any(Snooze.class));
+  }
+
+  @Test
+  void shouldReturn400_whenSnoozeMinutesNotPositive() throws Exception {
+    final var request = Snooze.builder()
+        .parentEventId(1L)
+        .snoozeMinutes(0)
         .build();
 
     mockMvc.perform(post("/v1/snooze")
@@ -67,7 +81,7 @@ public class SnoozeControllerTest {
   void shouldReturn202_whenSnoozeIsCalled() throws Exception {
     final var request = Snooze.builder()
         .parentEventId(1L)
-        .newScheduledAt(LocalDateTime.now())
+        .snoozeMinutes(60)
         .build();
 
     mockMvc.perform(post("/v1/snooze")

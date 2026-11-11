@@ -22,11 +22,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class SnoozeServiceTest {
+
+  // "Now" is 10:30:45, i.e. the user taps snooze long after the 08:00 reminder fired
+  private static final Clock CLOCK = Clock.fixed(Instant.parse("2026-08-25T10:30:45Z"), ZoneOffset.UTC);
 
   private NtfyClient ntfyClient;
   private NtfyClient.NtfyRequestBuilder ntfyRequestBuilder;
@@ -42,24 +48,24 @@ public class SnoozeServiceTest {
     ntfyRequestBuilder = mock(NtfyClient.NtfyRequestBuilder.class);
     eventRepository = mock(EventRepository.class);
 
-    snoozeService = new SnoozeService(eventRepository, ntfyClient);
+    snoozeService = new SnoozeService(CLOCK, eventRepository, ntfyClient);
 
     eventCaptor = ArgumentCaptor.forClass(EventEntity.class);
   }
 
   @Test
-  void shouldSaveSnoozedEventAndNotify_whenParentEventFound() {
+  void shouldScheduleSnoozeRelativeToNow_notToParentScheduledAt() {
     final var parentEvent = EventEntity.builder()
         .id(1L)
-        .type(EventType.ADHOC)
+        .type(EventType.BIO_WASTE_COLLECTION)
         .message("parent message")
-        .scheduledAt(LocalDateTime.of(2026, 8, 25, 10, 0))
+        .scheduledAt(LocalDateTime.of(2026, 8, 25, 8, 0))
         .build();
-    final var newScheduledAt = LocalDateTime.of(2026, 8, 26, 10, 0);
     final var request = Snooze.builder()
         .parentEventId(1L)
-        .newScheduledAt(newScheduledAt)
+        .snoozeMinutes(60)
         .build();
+    final var expectedScheduledAt = LocalDateTime.of(2026, 8, 25, 11, 30);
 
     doReturn(Optional.of(parentEvent)).when(eventRepository).findById(1L);
     doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(ReminderType.class));
@@ -73,13 +79,13 @@ public class SnoozeServiceTest {
     verify(ntfyClient).notification(ReminderType.ADHOC);
     verify(ntfyRequestBuilder).withTitle(EventType.SNOOZE.name());
     verify(ntfyRequestBuilder).withMessage(
-        String.format("Reminder for '%s' is snoozed to %s", "parent message", newScheduledAt));
+        String.format("Reminder for '%s' is snoozed to %s", "parent message", expectedScheduledAt));
     verify(ntfyRequestBuilder).withEmojis(any());
 
     final var savedEntity = eventCaptor.getValue();
     assertEquals(EventType.SNOOZE, savedEntity.getType());
     assertEquals("parent message", savedEntity.getMessage());
-    assertEquals(newScheduledAt, savedEntity.getScheduledAt());
+    assertEquals(expectedScheduledAt, savedEntity.getScheduledAt());
     assertEquals(parentEvent, savedEntity.getParentEvent());
   }
 
@@ -87,7 +93,7 @@ public class SnoozeServiceTest {
   void shouldThrowRemindlyException_whenParentEventNotFound() {
     final var request = Snooze.builder()
         .parentEventId(99L)
-        .newScheduledAt(LocalDateTime.now())
+        .snoozeMinutes(60)
         .build();
 
     doReturn(Optional.empty()).when(eventRepository).findById(99L);

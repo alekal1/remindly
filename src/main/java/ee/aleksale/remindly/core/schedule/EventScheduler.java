@@ -62,24 +62,24 @@ public class EventScheduler {
                     .action(NtfyAction.NtfyActionType.HTTP)
                     .label("Snooze (1 hour)")
                     .url(properties.getExternalBaseUrl() + ApiConstants.SNOOZE_API_URL)
-                    .body(snooze(event.getId(), event.getScheduledAt().plusHours(1)))
+                    .body(snooze(event.getId(), 60))
                     .headers(Map.of(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                     .build(),
             NtfyAction.builder()
                     .action(NtfyAction.NtfyActionType.HTTP)
                     .label("Snooze (3 hours)")
                     .url(properties.getExternalBaseUrl() + ApiConstants.SNOOZE_API_URL)
-                    .body(snooze(event.getId(), event.getScheduledAt().plusHours(3)))
+                    .body(snooze(event.getId(), 180))
                     .headers(Map.of(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                     .build());
   }
 
-  private String snooze(Long eventId, LocalDateTime time) {
+  private String snooze(Long eventId, int snoozeMinutes) {
     try {
       return objectMapper.writeValueAsString(
               Snooze.builder()
                       .parentEventId(eventId)
-                      .newScheduledAt(time)
+                      .snoozeMinutes(snoozeMinutes)
                       .build()
       );
     } catch (Exception e) {

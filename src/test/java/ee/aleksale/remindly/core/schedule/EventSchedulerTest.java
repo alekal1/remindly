@@ -1,6 +1,8 @@
 package ee.aleksale.remindly.core.schedule;
 
 import ee.aleksale.remindly.core.client.NtfyClient;
+import ee.aleksale.remindly.core.model.dto.NtfyAction;
+import org.mockito.ArgumentCaptor;
 import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.property.RemindlyAppProperties;
 import ee.aleksale.remindly.core.model.domain.EventEntity;
@@ -74,5 +76,38 @@ class EventSchedulerTest {
     verify(ntfyRequestBuilder, times(1)).send();
     verify(eventRepository, times(1)).save(event);
     assertThat(event.getSentAt()).isEqualTo(dueAt);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void shouldBuildSnoozeActionsWithRelativeDuration() {
+    final var clock = Clock.fixed(Instant.parse("2026-08-25T10:30:00Z"), ZoneOffset.UTC);
+    final var now = LocalDateTime.of(2026, 8, 25, 10, 30);
+    final var event = EventEntity.builder()
+            .id(7L)
+            .type(EventType.BIO_WASTE_COLLECTION)
+            .scheduledAt(LocalDateTime.of(2026, 8, 25, 8, 0))
+            .message("test message")
+            .build();
+    final ArgumentCaptor<List<NtfyAction>> actionsCaptor = ArgumentCaptor.forClass(List.class);
+
+    doReturn(List.of(event))
+            .when(eventRepository)
+            .findAllBySentAtIsNullAndScheduledAtLessThanEqual(now);
+    doReturn(ntfyRequestBuilder).when(ntfyClient).notification(any(ReminderType.class));
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withTitle(anyString());
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withMessage(anyString());
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withEmojis(any());
+    doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withActions(anyList());
+    doReturn("https://example.com").when(properties).getExternalBaseUrl();
+
+    new EventScheduler(clock, eventRepository, ntfyClient, properties, objectMapper).processEvents();
+
+    verify(ntfyRequestBuilder).withActions(actionsCaptor.capture());
+    final var actions = actionsCaptor.getValue().stream().map(NtfyAction::toString).toList();
+    assertThat(actions).hasSize(2);
+    assertThat(actions.get(0)).contains("\"parentEventId\":7").contains("\"snoozeMinutes\":60");
+    assertThat(actions.get(1)).contains("\"parentEventId\":7").contains("\"snoozeMinutes\":180");
+    assertThat(actions).noneMatch(a -> a.contains("newScheduledAt"));
   }
 }
