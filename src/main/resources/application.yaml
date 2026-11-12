@@ -36,7 +36,6 @@ app:
   calendar:
     feed-token: ${ICAL_FEED_TOKEN:}
     alarm-trigger: ${ICAL_ALARM_TRIGGER:PT8H}
-    ntfy-backup-enabled: ${ICAL_NTFY_BACKUP_ENABLED:false}
   gmail:
     credentials-file: ${GMAIL_CREDENTIALS_FILE}
     token-directory: ${GMAIL_TOKEN_DIRECTORY}

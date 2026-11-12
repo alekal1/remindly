@@ -53,7 +53,6 @@ The app reads environment variables from `.env` at startup.
 | `NTFY_ADHOC_TOPIC` | `reminders.topic` | Topic for adhoc notifications. | - |
 | `ICAL_FEED_TOKEN` | `calendar.feed-token` | Secret token in the iCal feed URL. Feed is disabled (404) when empty. | - |
 | `ICAL_ALARM_TRIGGER` | `calendar.alarm-trigger` | Calendar alert time relative to midnight of the collection day (ISO-8601 duration, e.g. `PT8H` = 08:00, `-PT4H` = 20:00 the evening before). | PT8H |
-| `ICAL_NTFY_BACKUP_ENABLED` | `calendar.ntfy-backup-enabled` | Also push garbage collection events through ntfy. | false |
 | `GMAIL_CREDENTIALS_FILE` | `credentials-file` | Path to the Google OAuth client credentials JSON. | /secrets/google-credentials.json |
 | `GMAIL_TOKEN_DIRECTORY` | `token-directory` | Directory where the OAuth access/refresh tokens are stored after authorization. | /app/data/gmail |
 | `GMAIL_AUTH_CALLBACK_BASE_URL` | `auth-callback-url` | Base URL used to build the OAuth redirect/callback URL. | http://localhost:9999 |
@@ -77,7 +76,6 @@ app:
    calendar:
       feed-token: ${ICAL_FEED_TOKEN:}
       alarm-trigger: ${ICAL_ALARM_TRIGGER:PT8H}
-      ntfy-backup-enabled: ${ICAL_NTFY_BACKUP_ENABLED:false}
    gmail:
       credentials-file: ${GMAIL_CREDENTIALS_FILE}
       token-directory: ${GMAIL_TOKEN_DIRECTORY}
@@ -150,8 +148,8 @@ https://<APP_DOMAIN>/v1/calendar/<ICAL_FEED_TOKEN>.ics
 4. Set **Fetch New Data** to a short interval (every 15 minutes at best) so changes from schedule
    resets or emails show up quickly.
 
-Limitations: calendar alerts can't snooze. If you need the that behaviour, set
-`ICAL_NTFY_BACKUP_ENABLED=true` and garbage events are pushed through ntfy too.
+Garbage collection events are delivered only through this feed. They are never pushed through ntfy,
+and calendar alerts can't be snoozed.
 
 ## Run with Docker
 

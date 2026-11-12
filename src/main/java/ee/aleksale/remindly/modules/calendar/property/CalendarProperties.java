@@ -14,5 +14,4 @@ public class CalendarProperties {
   private String feedToken;
   private Duration alarmTrigger = Duration.ofHours(8);
   private int pastDays = 30;
-  private boolean ntfyBackupEnabled = false;
 }

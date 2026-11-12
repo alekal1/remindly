@@ -9,7 +9,6 @@ import ee.aleksale.remindly.core.model.domain.EventEntity;
 import ee.aleksale.remindly.core.model.type.DeliveryChannel;
 import ee.aleksale.remindly.core.model.type.EventType;
 import ee.aleksale.remindly.core.repository.EventRepository;
-import ee.aleksale.remindly.modules.calendar.property.CalendarProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +41,6 @@ class EventSchedulerTest {
   private NtfyClient.NtfyRequestBuilder ntfyRequestBuilder;
   private RemindlyAppProperties properties;
   private ObjectMapper objectMapper;
-  private CalendarProperties calendarProperties;
 
   @BeforeEach()
   void init() {
@@ -51,7 +49,6 @@ class EventSchedulerTest {
     ntfyRequestBuilder = mock(NtfyClient.NtfyRequestBuilder.class);
     properties = mock(RemindlyAppProperties.class);
     objectMapper = new ObjectMapper();
-    calendarProperties = new CalendarProperties();
   }
 
   @Test
@@ -75,7 +72,7 @@ class EventSchedulerTest {
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withActions(anyList());
     doReturn("https://example.com").when(properties).getExternalBaseUrl();
 
-    final var scheduler = new EventScheduler(clock, eventRepository, ntfyClient, properties, objectMapper, calendarProperties);
+    final var scheduler = new EventScheduler(clock, eventRepository, ntfyClient, properties, objectMapper);
 
     scheduler.processEvents();
     scheduler.processEvents();
@@ -108,7 +105,7 @@ class EventSchedulerTest {
     doReturn(ntfyRequestBuilder).when(ntfyRequestBuilder).withActions(anyList());
     doReturn("https://example.com").when(properties).getExternalBaseUrl();
 
-    new EventScheduler(clock, eventRepository, ntfyClient, properties, objectMapper, calendarProperties).processEvents();
+    new EventScheduler(clock, eventRepository, ntfyClient, properties, objectMapper).processEvents();
 
     verify(ntfyRequestBuilder).withActions(actionsCaptor.capture());
     final var actions = actionsCaptor.getValue().stream().map(NtfyAction::toString).toList();
@@ -120,13 +117,13 @@ class EventSchedulerTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  void shouldQueryOnlyNtfyEventTypes_whenNtfyBackupDisabled() {
+  void shouldQueryOnlyNtfyEventTypes_neverCalendarEventTypes() {
     final var clock = Clock.fixed(Instant.parse("2026-08-25T10:30:00Z"), ZoneOffset.UTC);
     final ArgumentCaptor<Collection<EventType>> typesCaptor = ArgumentCaptor.forClass(Collection.class);
     doReturn(List.of()).when(eventRepository)
             .findAllBySentAtIsNullAndScheduledAtLessThanEqualAndTypeIn(any(), anyCollection());
 
-    new EventScheduler(clock, eventRepository, ntfyClient, properties, objectMapper, calendarProperties).processEvents();
+    new EventScheduler(clock, eventRepository, ntfyClient, properties, objectMapper).processEvents();
 
     verify(eventRepository).findAllBySentAtIsNullAndScheduledAtLessThanEqualAndTypeIn(any(), typesCaptor.capture());
     assertThat(typesCaptor.getValue())
@@ -137,20 +134,5 @@ class EventSchedulerTest {
                     EventType.SNOOZE,
                     EventType.REMINDLY_APP_ERROR)
             .doesNotContainAnyElementsOf(EventType.byChannel(DeliveryChannel.CALENDAR));
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  void shouldQueryAlsoCalendarEventTypes_whenNtfyBackupEnabled() {
-    final var clock = Clock.fixed(Instant.parse("2026-08-25T10:30:00Z"), ZoneOffset.UTC);
-    final ArgumentCaptor<Collection<EventType>> typesCaptor = ArgumentCaptor.forClass(Collection.class);
-    calendarProperties.setNtfyBackupEnabled(true);
-    doReturn(List.of()).when(eventRepository)
-            .findAllBySentAtIsNullAndScheduledAtLessThanEqualAndTypeIn(any(), anyCollection());
-
-    new EventScheduler(clock, eventRepository, ntfyClient, properties, objectMapper, calendarProperties).processEvents();
-
-    verify(eventRepository).findAllBySentAtIsNullAndScheduledAtLessThanEqualAndTypeIn(any(), typesCaptor.capture());
-    assertThat(typesCaptor.getValue()).containsExactlyInAnyOrder(EventType.values());
   }
 }
