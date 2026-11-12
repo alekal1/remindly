@@ -2,6 +2,7 @@ package ee.aleksale.remindly.core.repository;
 
 import ee.aleksale.remindly.core.config.EnvApplicationContextInitializer;
 import ee.aleksale.remindly.core.model.domain.EventEntity;
+import ee.aleksale.remindly.core.model.type.DeliveryChannel;
 import ee.aleksale.remindly.core.model.type.EventType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,12 +62,34 @@ class EventRepositoryTest {
     final var dueUnsentAt = eventRepository.save(event(EventType.REMINDLY_APP_ERROR, now, null, "due-at"));
     eventRepository.save(event(EventType.GARBAGE_SCHEDULE_RESET, now.plusMinutes(1), null, "future"));
     eventRepository.save(event(EventType.BIO_WASTE_COLLECTION, now.minusMinutes(1), now.minusMinutes(1), "already-sent"));
+    eventRepository.save(event(EventType.MIXED_WASTE_COLLECTION, now.minusMinutes(1), null, "calendar-type"));
 
-    final var dueEvents = eventRepository.findAllBySentAtIsNullAndScheduledAtLessThanEqual(now);
+    final var dueEvents = eventRepository.findAllBySentAtIsNullAndScheduledAtLessThanEqualAndTypeIn(
+            now, EventType.byChannel(DeliveryChannel.NTFY));
 
     assertThat(dueEvents)
             .extracting(EventEntity::getId)
             .containsExactlyInAnyOrder(dueUnsentBefore.getId(), dueUnsentAt.getId());
+  }
+
+  @Test
+  void shouldFindCalendarEventsAfterGivenTime_orderedAscending() {
+    final var from = LocalDateTime.of(2026, 8, 1, 0, 0);
+    eventRepository.save(event(EventType.ADHOC, from.plusDays(1), null, "wrong-type"));
+    eventRepository.save(event(EventType.BIO_WASTE_COLLECTION, from.minusDays(1), null, "too-old"));
+    final var later = eventRepository.save(event(EventType.PACKAGING_WASTE_COLLECTION, from.plusDays(5), null, "later"));
+    final var sooner = eventRepository.save(event(EventType.MIXED_WASTE_COLLECTION, from.plusDays(2), now(), "sent-sooner"));
+
+    final var events = eventRepository.findAllByTypeInAndScheduledAtAfterOrderByScheduledAtAsc(
+            EventType.byChannel(DeliveryChannel.CALENDAR), from);
+
+    assertThat(events)
+            .extracting(EventEntity::getId)
+            .containsExactly(sooner.getId(), later.getId());
+  }
+
+  private static LocalDateTime now() {
+    return LocalDateTime.of(2026, 8, 3, 8, 0);
   }
 
   @Test

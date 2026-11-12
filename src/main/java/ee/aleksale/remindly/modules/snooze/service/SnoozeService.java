@@ -7,7 +7,7 @@ import ee.aleksale.remindly.core.model.type.EventType;
 import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.repository.EventRepository;
 import ee.aleksale.remindly.modules.snooze.dto.Snooze;
-import ee.aleksale.remindly.utils.EmojiUtils;
+import ee.aleksale.remindly.utils.Emoji;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class SnoozeService {
             .withTitle(EventType.SNOOZE.name())
             .withMessage(String.format("Reminder for '%s' is snoozed to %s",
                     parentEvent.getMessage(), snoozedEvent.getScheduledAt()))
-            .withEmojis(List.of(EmojiUtils.ZZZ, EmojiUtils.SLEEPING))
+            .withEmojis(List.of(Emoji.ZZZ, Emoji.SLEEPING))
             .send();
 
   }

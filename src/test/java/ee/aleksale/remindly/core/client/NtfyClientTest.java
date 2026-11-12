@@ -14,6 +14,7 @@ import ee.aleksale.remindly.core.model.dto.NtfyAction;
 import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.property.RemindlyAppProperties;
 import ee.aleksale.remindly.core.service.NtfyHeaderService;
+import ee.aleksale.remindly.utils.Emoji;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,7 +58,7 @@ class NtfyClientTest {
     ntfyClient.notification(ReminderType.ADHOC)
             .withTitle("ADHOC")
             .withMessage("test message")
-            .withEmojis(List.of("memo", "bell"))
+            .withEmojis(List.of(Emoji.MEMO, Emoji.BELL))
             .send();
 
     verify(restTemplate).postForEntity(urlCaptor.capture(), requestCaptor.capture(), any(Class.class));
@@ -105,7 +106,7 @@ class NtfyClientTest {
 
     final var exception = assertThrows(
             RemindlyException.class,
-            () -> ntfyClient.notification(ReminderType.ADHOC).withMessage("test").withEmojis(List.of("memo")).send()
+            () -> ntfyClient.notification(ReminderType.ADHOC).withMessage("test").withEmojis(List.of(Emoji.MEMO)).send()
     );
 
     assertEquals("Notification for event type ADHOC is disabled.", exception.getMessage());

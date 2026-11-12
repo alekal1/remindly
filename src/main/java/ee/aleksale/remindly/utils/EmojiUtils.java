@@ -3,34 +3,24 @@ package ee.aleksale.remindly.utils;
 import ee.aleksale.remindly.core.model.type.EventType;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static ee.aleksale.remindly.utils.Emoji.ARROWS_COUNTERCLOCKWISE;
+import static ee.aleksale.remindly.utils.Emoji.BELL;
+import static ee.aleksale.remindly.utils.Emoji.ENVELOPE_WITH_ARROW;
+import static ee.aleksale.remindly.utils.Emoji.LABEL;
+import static ee.aleksale.remindly.utils.Emoji.LEAVES;
+import static ee.aleksale.remindly.utils.Emoji.MEMO;
+import static ee.aleksale.remindly.utils.Emoji.PACKAGE;
+import static ee.aleksale.remindly.utils.Emoji.PUSHPIN;
+import static ee.aleksale.remindly.utils.Emoji.RECYCLE;
+import static ee.aleksale.remindly.utils.Emoji.ROTATING_LIGHT;
+import static ee.aleksale.remindly.utils.Emoji.SEEDLING;
+import static ee.aleksale.remindly.utils.Emoji.WASTEBASKET;
 
 public class EmojiUtils {
-  public static final String SEEDLING = "seedling"; // 🌱
-  public static final String LEAVES = "leaves"; // 🍃
 
-  public static final String PACKAGE = "package"; // 📦
-  public static final String LABEL = "label"; // 🏷️
-
-  public static final String WASTEBASKET = "wastebasket"; // 🗑️
-  public static final String RECYCLE = "recycle"; // ♻️️
-
-  public static final String MEMO = "memo"; // 📝
-  public static final String BELL = "bell"; // 🔔
-
-  public static final String ZZZ = "zzz"; // 💤
-  public static final String SLEEPING = "sleeping"; // 😴
-
-  public static final String ROTATING_LIGHT = "rotating_light"; // 🚨
-  public static final String ARROWS_COUNTERCLOCKWISE = "arrows_counterclockwise"; // 🔄
-
-  public static final String PUSHPIN = "pushpin "; // 📌
-  public static final String ENVELOPE_WITH_ARROW = "envelope_with_arrow"; // 📩
-
-  public static final String INBOX_TRAY = "inbox_tray"; // 📥
-  public static final String EMAIL = "email"; // 📧
-
-
-  public static List<String> getEmojisForEventType(EventType eventType) {
+  public static List<Emoji> getEmojisForEventType(EventType eventType) {
     return switch (eventType) {
       case BIO_WASTE_COLLECTION -> List.of(SEEDLING, LEAVES);
       case MIXED_WASTE_COLLECTION -> List.of(WASTEBASKET, RECYCLE);
@@ -41,6 +31,14 @@ public class EmojiUtils {
       case SNOOZE -> List.of(PUSHPIN, MEMO, BELL);
       case REMINDLY_APP_ERROR -> List.of(ROTATING_LIGHT);
     };
+  }
+
+  public static String toShortcodes(List<Emoji> emojis) {
+    return emojis.stream().map(Emoji::getShortcode).collect(Collectors.joining(","));
+  }
+
+  public static String toUnicode(List<Emoji> emojis) {
+    return emojis.stream().map(Emoji::getUnicode).collect(Collectors.joining());
   }
 
 }

@@ -9,7 +9,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.stream.Stream;
 
 public class DateUtilsTest {
@@ -53,5 +57,23 @@ public class DateUtilsTest {
     final var result = DateUtils.convertToLocalDate(date, blankValue);
 
     assertNull(result);
+  }
+
+  @Test
+  void shouldReturnStartOfDayDaysAgo() {
+    final var clock = Clock.fixed(Instant.parse("2024-06-17T15:42:10Z"), ZoneOffset.UTC);
+
+    final var result = DateUtils.startOfDayDaysAgo(clock, 30);
+
+    assertEquals(LocalDateTime.of(2024, 5, 18, 0, 0), result);
+  }
+
+  @Test
+  void shouldReturnStartOfToday_whenZeroDaysAgo() {
+    final var clock = Clock.fixed(Instant.parse("2024-06-17T15:42:10Z"), ZoneOffset.UTC);
+
+    final var result = DateUtils.startOfDayDaysAgo(clock, 0);
+
+    assertEquals(LocalDateTime.of(2024, 6, 17, 0, 0), result);
   }
 }

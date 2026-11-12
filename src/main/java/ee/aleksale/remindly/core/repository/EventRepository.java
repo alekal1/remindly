@@ -18,7 +18,8 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
   void deleteAllByTypeIn(Collection<EventType> types);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
-  List<EventEntity> findAllBySentAtIsNullAndScheduledAtLessThanEqual(LocalDateTime scheduledAt);
+  List<EventEntity> findAllBySentAtIsNullAndScheduledAtLessThanEqualAndTypeIn(
+      LocalDateTime scheduledAt, Collection<EventType> types);
 
   boolean existsByTypeAndScheduledAtBetween(
       EventType type, LocalDateTime scheduledAtStart, LocalDateTime scheduledAtEnd);
@@ -28,4 +29,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
           LocalDateTime scheduledAtAfter,
           Pageable pageable);
 
+  List<EventEntity> findAllByTypeInAndScheduledAtAfterOrderByScheduledAtAsc(
+          Collection<EventType> types,
+          LocalDateTime scheduledAtAfter);
 }

@@ -9,6 +9,10 @@ auto-schedule reminders from incoming emails (e.g. garbage collection notices). 
 runs entirely on your own infrastructure — no reminder app or backend required — and ntfy can
 point at the free public `ntfy.sh` service or your own self-hosted ntfy instance.
 
+Garbage collection reminders (from the uploaded schedule and from emails) are published as an
+**iCal feed** that your phone's calendar subscribes to, so the calendar itself shows the alert.
+ntfy stays the channel for confirmations, errors, ad-hoc/snoozed reminders and garbage schedule output.
+
 ## Tech stack
 
 - Java 25
@@ -29,9 +33,10 @@ point at the free public `ntfy.sh` service or your own self-hosted ntfy instance
 ## Modules
 
 - `core` - Shared domain, persistence, ntfy client, scheduler, and reminder guards.
-- `adhoc` - Creates one-off reminders through `POST /v1/adhoc`.
+- `adhoc` - Creates one-off reminders.
 - `garbage_collection` - Imports garbage collection schedules and converts them into reminders.
 - `snooze` - Snooze functionality for reminders
+- `calendar` - iCal feed with garbage collection events.
 - `gmail` - Fetches gmail email content based on templates and creates reminder for each.
 
 
@@ -49,6 +54,9 @@ The app reads environment variables from `.env` at startup.
 | `NTFY_GARBAGE_COLLECTION_TOPIC_ENABLED` | `reminders.enabled` | Whether the garbage collection notifications reminder is enabled. | false |
 | `NTFY_ADHOC_TOPIC` | `reminders.topic` | Topic for adhoc notifications. | - |
 | `NTFY_ADHOC_TOPIC_ENABLED` | `reminders.enabled` | Whether the adhoc notifications reminder is enabled. | true |
+| `ICAL_FEED_TOKEN` | `calendar.feed-token` | Secret token in the iCal feed URL. Feed is disabled (404) when empty. | - |
+| `ICAL_ALARM_TRIGGER` | `calendar.alarm-trigger` | Calendar alert time relative to midnight of the collection day (ISO-8601 duration, e.g. `PT8H` = 08:00, `-PT4H` = 20:00 the evening before). | PT8H |
+| `ICAL_NTFY_BACKUP_ENABLED` | `calendar.ntfy-backup-enabled` | Also push garbage collection events through ntfy. | false |
 | `GMAIL_CREDENTIALS_FILE` | `credentials-file` | Path to the Google OAuth client credentials JSON. | /secrets/google-credentials.json |
 | `GMAIL_TOKEN_DIRECTORY` | `token-directory` | Directory where the OAuth access/refresh tokens are stored after authorization. | /app/data/gmail |
 | `GMAIL_AUTH_CALLBACK_BASE_URL` | `auth-callback-url` | Base URL used to build the OAuth redirect/callback URL. | http://localhost:9999 |
@@ -72,6 +80,10 @@ app:
       - id: adhoc
         topic: ${NTFY_ADHOC_TOPIC}
         enabled: ${NTFY_ADHOC_TOPIC_ENABLED}
+   calendar:
+      feed-token: ${ICAL_FEED_TOKEN:}
+      alarm-trigger: ${ICAL_ALARM_TRIGGER:PT8H}
+      ntfy-backup-enabled: ${ICAL_NTFY_BACKUP_ENABLED:false}
    gmail:
       credentials-file: ${GMAIL_CREDENTIALS_FILE}
       token-directory: ${GMAIL_TOKEN_DIRECTORY}
@@ -122,6 +134,28 @@ Setup:
 3. Start the app, then open `GET /v1/gmail/setup"` in a browser to begin the OAuth consent flow.
 4. After granting access, Google redirects to `/v1/gmail/setup/callback`, which exchanges the authorization code for tokens and stores them under `GMAIL_TOKEN_DIRECTORY`.
 5. Once authorized, `GmailMessageScheduler` periodically polls the Gmail inbox for new schedule attachments.
+
+## Calendar feed (iOS)
+
+Garbage collection events (`BIO`/`MIXED`/`PACKAGING_WASTE_COLLECTION`, whether imported from the
+schedule PDF or from Gmail) are not pushed through ntfy. They are published as all-day events with an
+alert in an iCal feed:
+
+```
+https://<APP_DOMAIN>/v1/calendar/<ICAL_FEED_TOKEN>.ics
+```
+
+1. Generate a token, e.g. `openssl rand -hex 24`, and set it as `ICAL_FEED_TOKEN`. Treat the URL as a
+   secret: anyone with it can read the feed. An unknown token returns `404`.
+2. On iPhone: **Settings → Apps → Calendar → Calendar Accounts → Add Account → Other → Add Subscribed
+   Calendar**, then paste the URL (the app must be reachable over HTTPS, see
+   [Reverse proxy / HTTPS](#reverse-proxy--https)).
+3. In the subscription settings, keep **Remove Alerts** turned **off**, otherwise iOS drops the alerts.
+4. Set **Fetch New Data** to a short interval (every 15 minutes at best) so changes from schedule
+   resets or emails show up quickly.
+
+Limitations: calendar alerts can't snooze. If you need the that behaviour, set
+`ICAL_NTFY_BACKUP_ENABLED=true` and garbage events are pushed through ntfy too.
 
 ## Run with Docker
 

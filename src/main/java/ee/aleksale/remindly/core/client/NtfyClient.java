@@ -6,6 +6,8 @@ import ee.aleksale.remindly.core.model.dto.NtfyRequestPayload;
 import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.property.RemindlyAppProperties;
 import ee.aleksale.remindly.core.service.NtfyHeaderService;
+import ee.aleksale.remindly.utils.Emoji;
+import ee.aleksale.remindly.utils.EmojiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
@@ -57,7 +59,7 @@ public class NtfyClient {
 
     private String title;
     private String message;
-    private List<String> emojis;
+    private List<Emoji> emojis;
     private List<NtfyAction> ntfyActions;
 
     private NtfyRequestBuilder(NtfyClient client, ReminderType reminderType) {
@@ -76,7 +78,7 @@ public class NtfyClient {
       return this;
     }
 
-    public NtfyRequestBuilder withEmojis(List<String> emojis) {
+    public NtfyRequestBuilder withEmojis(List<Emoji> emojis) {
       this.emojis = emojis;
       return this;
     }
@@ -97,7 +99,7 @@ public class NtfyClient {
               title,
               message,
               ntfyActions,
-              emojis == null ? null : String.join(",", emojis)
+              emojis == null ? null : EmojiUtils.toShortcodes(emojis)
       ));
     }
   }

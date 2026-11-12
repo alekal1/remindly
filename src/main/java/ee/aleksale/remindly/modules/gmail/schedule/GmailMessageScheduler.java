@@ -7,7 +7,7 @@ import ee.aleksale.remindly.modules.gmail.model.GmailTemplateLoader;
 import ee.aleksale.remindly.modules.gmail.model.GmailContext;
 import ee.aleksale.remindly.modules.gmail.service.GmailTemplateProcessingService;
 import ee.aleksale.remindly.modules.gmail.service.client.GmailClient;
-import ee.aleksale.remindly.utils.EmojiUtils;
+import ee.aleksale.remindly.utils.Emoji;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -65,7 +65,7 @@ public class GmailMessageScheduler {
 
         ntfyClient.notification(reminderType)
                 .withTitle("Gmail fetched for template " + template.getId())
-                .withEmojis(List.of(EmojiUtils.INBOX_TRAY, EmojiUtils.EMAIL))
+                .withEmojis(List.of(Emoji.INBOX_TRAY, Emoji.EMAIL))
                 .withMessage(String.format("%d entities were processed.", savedEntities))
                 .send();
     }

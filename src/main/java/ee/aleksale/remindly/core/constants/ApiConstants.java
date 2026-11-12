@@ -6,4 +6,5 @@ public class ApiConstants {
 
   public static final String ADHOC_API_URL = "/v1/adhoc";
   public static final String SNOOZE_API_URL = "/v1/snooze";
+  public static final String CALENDAR_API_URL = "/v1/calendar";
 }
