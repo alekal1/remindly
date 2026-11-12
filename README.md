@@ -49,11 +49,8 @@ The app reads environment variables from `.env` at startup.
 | `APP_EXTERNAL_BASE_URL` | `external-base-url` | Base URL of the application, used for building callback URLs. | - |
 | `NTFY_SERVER_URL` | `ntfy-server` | URL of the ntfy server. | https://ntfy.sh |
 | `NTFY_ERRORS_TOPIC` | `reminders.topic` | Topic for error notifications. | - |
-| `NTFY_ERRORS_TOPIC_ENABLED` | `reminders.enabled` | Whether the error notifications reminder is enabled. | true |
 | `NTFY_GARBAGE_COLLECTION_TOPIC` | `reminders.topic` | Topic for garbage collection notifications. | - |
-| `NTFY_GARBAGE_COLLECTION_TOPIC_ENABLED` | `reminders.enabled` | Whether the garbage collection notifications reminder is enabled. | false |
 | `NTFY_ADHOC_TOPIC` | `reminders.topic` | Topic for adhoc notifications. | - |
-| `NTFY_ADHOC_TOPIC_ENABLED` | `reminders.enabled` | Whether the adhoc notifications reminder is enabled. | true |
 | `ICAL_FEED_TOKEN` | `calendar.feed-token` | Secret token in the iCal feed URL. Feed is disabled (404) when empty. | - |
 | `ICAL_ALARM_TRIGGER` | `calendar.alarm-trigger` | Calendar alert time relative to midnight of the collection day (ISO-8601 duration, e.g. `PT8H` = 08:00, `-PT4H` = 20:00 the evening before). | PT8H |
 | `ICAL_NTFY_BACKUP_ENABLED` | `calendar.ntfy-backup-enabled` | Also push garbage collection events through ntfy. | false |
@@ -73,13 +70,10 @@ app:
    reminders:
       - id: errors
         topic: ${NTFY_ERRORS_TOPIC}
-        enabled: ${NTFY_ERRORS_TOPIC_ENABLED}
       - id: garbage-collection
         topic: ${NTFY_GARBAGE_COLLECTION_TOPIC}
-        enabled: ${NTFY_GARBAGE_COLLECTION_TOPIC_ENABLED}
       - id: adhoc
         topic: ${NTFY_ADHOC_TOPIC}
-        enabled: ${NTFY_ADHOC_TOPIC_ENABLED}
    calendar:
       feed-token: ${ICAL_FEED_TOKEN:}
       alarm-trigger: ${ICAL_ALARM_TRIGGER:PT8H}
@@ -89,6 +83,8 @@ app:
       token-directory: ${GMAIL_TOKEN_DIRECTORY}
       auth-callback-url: ${GMAIL_AUTH_CALLBACK_BASE_URL}
 ```
+
+There is no server-side switch to disable a topic. To mute a topic, unsubscribe from it in the ntfy app.
 
 Reminder topic configuration is also exposed through Spring Actuator at `GET /actuator/info` under:
 

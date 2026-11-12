@@ -1,6 +1,5 @@
 package ee.aleksale.remindly.core.client;
 
-import ee.aleksale.remindly.core.exception.RemindlyException;
 import ee.aleksale.remindly.core.model.dto.NtfyAction;
 import ee.aleksale.remindly.core.model.dto.NtfyRequestPayload;
 import ee.aleksale.remindly.core.model.type.ReminderType;
@@ -32,10 +31,6 @@ public class NtfyClient {
   private void sendNotification(NtfyRequestPayload payload) {
     final var type = payload.reminderType();
     final var reminder = property.getReminderProps(type);
-
-    if (!reminder.isEnabled()) {
-      throw new RemindlyException("Notification for event type " + type + " is disabled.");
-    }
 
     var headers = ntfyHeaderService.getHeaders(payload);
 

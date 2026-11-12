@@ -1,15 +1,12 @@
 package ee.aleksale.remindly.core.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import ee.aleksale.remindly.core.exception.RemindlyException;
 import ee.aleksale.remindly.core.model.dto.NtfyAction;
 import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.core.property.RemindlyAppProperties;
@@ -45,7 +42,7 @@ class NtfyClientTest {
 
   @Test
   void shouldSendNotification_withExpectedUrlHeadersAndBody() {
-    final var reminder = reminder("adhoc", "topic-adhoc", true);
+    final var reminder = reminder("adhoc", "topic-adhoc");
     final var urlCaptor = ArgumentCaptor.forClass(String.class);
     final var requestCaptor = ArgumentCaptor.forClass(HttpEntity.class);
 
@@ -71,7 +68,7 @@ class NtfyClientTest {
 
    @Test
    void shouldQuoteHttpActionBody_whenBodyContainsJson() {
-     final var reminder = reminder("adhoc", "topic-adhoc", true);
+     final var reminder = reminder("adhoc", "topic-adhoc");
      final var requestCaptor = ArgumentCaptor.forClass(HttpEntity.class);
 
      doReturn("http://ntfy.sh").when(properties).getNtfyServer();
@@ -99,25 +96,10 @@ class NtfyClientTest {
      );
    }
 
-  @Test
-  void shouldThrow_whenReminderIsDisabled() {
-    final var reminder = reminder("adhoc", "topic-adhoc", false);
-    doReturn(reminder).when(properties).getReminderProps(ReminderType.ADHOC);
-
-    final var exception = assertThrows(
-            RemindlyException.class,
-            () -> ntfyClient.notification(ReminderType.ADHOC).withMessage("test").withEmojis(List.of(Emoji.MEMO)).send()
-    );
-
-    assertEquals("Notification for event type ADHOC is disabled.", exception.getMessage());
-    verify(restTemplate, never()).postForEntity(anyString(), any(HttpEntity.class), any(Class.class));
-  }
-
-  private static RemindlyAppProperties.ReminderProperties reminder(String name, String topic, boolean enabled) {
+  private static RemindlyAppProperties.ReminderProperties reminder(String name, String topic) {
     final var reminder = new RemindlyAppProperties.ReminderProperties();
     reminder.setId(name);
     reminder.setTopic(topic);
-    reminder.setEnabled(enabled);
     return reminder;
   }
 }

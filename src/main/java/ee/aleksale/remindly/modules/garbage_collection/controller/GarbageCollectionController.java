@@ -1,8 +1,6 @@
 package ee.aleksale.remindly.modules.garbage_collection.controller;
 
-import ee.aleksale.remindly.core.annotation.ReminderEnabled;
 import ee.aleksale.remindly.core.constants.ApiConstants;
-import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.modules.garbage_collection.service.GarbageCollectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +18,12 @@ public class GarbageCollectionController {
 
   private final GarbageCollectionService garbageCollectionService;
 
-  @ReminderEnabled(type = ReminderType.GARBAGE_COLLECTION)
   @PostMapping(value = "/reset")
   public ResponseEntity<Void> reset(@RequestParam(name = "file") MultipartFile garbageCollectionScheduleFile) {
     garbageCollectionService.resetAndExtractSchedules(garbageCollectionScheduleFile);
     return ResponseEntity.accepted().build();
   }
 
-  @ReminderEnabled(type = ReminderType.GARBAGE_COLLECTION)
   @GetMapping
   public ResponseEntity<Void> notifyNextEvent(@RequestParam(name = "limit", defaultValue = "3") int limit) {
     garbageCollectionService.notifyNextEvents(limit);

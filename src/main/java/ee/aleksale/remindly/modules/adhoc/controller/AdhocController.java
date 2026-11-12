@@ -1,8 +1,6 @@
 package ee.aleksale.remindly.modules.adhoc.controller;
 
-import ee.aleksale.remindly.core.annotation.ReminderEnabled;
 import ee.aleksale.remindly.core.constants.ApiConstants;
-import ee.aleksale.remindly.core.model.type.ReminderType;
 import ee.aleksale.remindly.modules.adhoc.dto.Adhoc;
 import ee.aleksale.remindly.modules.adhoc.service.AdhocService;
 import jakarta.validation.Valid;
@@ -21,7 +19,6 @@ public class AdhocController {
   private final AdhocService adhocService;
 
   @PostMapping
-  @ReminderEnabled(type = ReminderType.ADHOC)
   public ResponseEntity<Void> scheduleAdhoc(@RequestBody @Valid Adhoc request) {
     adhocService.adhoc(request);
 

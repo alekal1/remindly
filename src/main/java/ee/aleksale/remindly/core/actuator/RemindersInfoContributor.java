@@ -25,8 +25,7 @@ public class RemindersInfoContributor implements InfoContributor {
             .stream()
             .map(reminder -> Map.of(
                     "id", reminder.getId(),
-                    "topic", reminder.getTopic(),
-                    "enabled", reminder.isEnabled()
+                    "topic", reminder.getTopic()
             ))
             .toList();
 

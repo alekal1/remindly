@@ -29,13 +29,10 @@ app:
   reminders:
     - id: errors
       topic: ${NTFY_ERRORS_TOPIC}
-      enabled: ${NTFY_ERRORS_TOPIC_ENABLED}
     - id: garbage-collection
       topic: ${NTFY_GARBAGE_COLLECTION_TOPIC}
-      enabled: ${NTFY_GARBAGE_COLLECTION_TOPIC_ENABLED}
     - id: adhoc
       topic: ${NTFY_ADHOC_TOPIC}
-      enabled: ${NTFY_ADHOC_TOPIC_ENABLED}
   calendar:
     feed-token: ${ICAL_FEED_TOKEN:}
     alarm-trigger: ${ICAL_ALARM_TRIGGER:PT8H}

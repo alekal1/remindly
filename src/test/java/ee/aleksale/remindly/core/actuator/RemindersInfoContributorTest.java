@@ -16,8 +16,8 @@ class RemindersInfoContributorTest {
   void shouldExposeReminderConfigurationInInfoDetails() {
     final var properties = new RemindlyAppProperties();
     properties.setReminders(List.of(
-            reminder("errors", "errors-topic", true),
-            reminder("adhoc", "adhoc-topic", false)
+            reminder("errors", "errors-topic"),
+            reminder("adhoc", "adhoc-topic")
     ));
 
     final var contributor = new RemindersInfoContributor(properties);
@@ -36,17 +36,14 @@ class RemindersInfoContributorTest {
     assertEquals(2, reminders.size());
     assertEquals("errors", reminders.getFirst().get("id"));
     assertEquals("errors-topic", reminders.getFirst().get("topic"));
-    assertEquals(true, reminders.getFirst().get("enabled"));
     assertEquals("adhoc", reminders.get(1).get("id"));
     assertEquals("adhoc-topic", reminders.get(1).get("topic"));
-    assertEquals(false, reminders.get(1).get("enabled"));
   }
 
-  private static RemindlyAppProperties.ReminderProperties reminder(String id, String topic, boolean enabled) {
+  private static RemindlyAppProperties.ReminderProperties reminder(String id, String topic) {
     final var reminder = new RemindlyAppProperties.ReminderProperties();
     reminder.setId(id);
     reminder.setTopic(topic);
-    reminder.setEnabled(enabled);
     return reminder;
   }
 }

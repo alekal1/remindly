@@ -33,7 +33,6 @@ public class RemindlyAppProperties {
     public static class ReminderProperties {
         private String id;
         private String topic;
-        private boolean enabled;
     }
 
 }
