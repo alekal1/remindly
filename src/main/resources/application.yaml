@@ -29,8 +29,8 @@ app:
   reminders:
     - id: errors
       topic: ${NTFY_ERRORS_TOPIC}
-    - id: garbage-collection
-      topic: ${NTFY_GARBAGE_COLLECTION_TOPIC}
+    - id: confirmation
+      topic: ${NTFY_CONFIRMATION_TOPIC}
     - id: adhoc
       topic: ${NTFY_ADHOC_TOPIC}
   calendar:

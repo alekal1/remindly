@@ -49,8 +49,8 @@ The app reads environment variables from `.env` at startup.
 | `APP_EXTERNAL_BASE_URL` | `external-base-url` | Base URL of the application, used for building callback URLs. | - |
 | `NTFY_SERVER_URL` | `ntfy-server` | URL of the ntfy server. | https://ntfy.sh |
 | `NTFY_ERRORS_TOPIC` | `reminders.topic` | Topic for error notifications. | - |
-| `NTFY_GARBAGE_COLLECTION_TOPIC` | `reminders.topic` | Topic for garbage collection notifications. | - |
-| `NTFY_ADHOC_TOPIC` | `reminders.topic` | Topic for adhoc notifications. | - |
+| `NTFY_CONFIRMATION_TOPIC` | `reminders.topic` | Topic for confirmations and info: adhoc scheduled, snoozed, schedule reset, next garbage events, Gmail fetched. | - |
+| `NTFY_ADHOC_TOPIC` | `reminders.topic` | Topic for due adhoc and snoozed reminders (with snooze buttons). | - |
 | `ICAL_FEED_TOKEN` | `calendar.feed-token` | Secret token in the iCal feed URL. Feed is disabled (404) when empty. | - |
 | `ICAL_ALARM_TRIGGER` | `calendar.alarm-trigger` | Calendar alert time relative to midnight of the collection day (ISO-8601 duration, e.g. `PT8H` = 08:00, `-PT4H` = 20:00 the evening before). | PT8H |
 | `GMAIL_CREDENTIALS_FILE` | `credentials-file` | Path to the Google OAuth client credentials JSON. | /secrets/google-credentials.json |
@@ -69,8 +69,8 @@ app:
    reminders:
       - id: errors
         topic: ${NTFY_ERRORS_TOPIC}
-      - id: garbage-collection
-        topic: ${NTFY_GARBAGE_COLLECTION_TOPIC}
+      - id: confirmation
+        topic: ${NTFY_CONFIRMATION_TOPIC}
       - id: adhoc
         topic: ${NTFY_ADHOC_TOPIC}
    calendar:
@@ -81,6 +81,15 @@ app:
       token-directory: ${GMAIL_TOKEN_DIRECTORY}
       auth-callback-url: ${GMAIL_AUTH_CALLBACK_BASE_URL}
 ```
+
+ntfy topics:
+
+- `errors` - application errors (e.g. failed Gmail token refresh).
+- `confirmation` - feedback on actions: adhoc reminder scheduled, reminder snoozed, garbage schedule reset,
+  next garbage events, Gmail messages fetched.
+- `adhoc` - adhoc and snoozed reminders when they are due, with snooze buttons. Only things you have to act on.
+
+Garbage collection days are not pushed to ntfy; they come from the [iCal feed](#calendar-feed-ios).
 
 There is no server-side switch to disable a topic. To mute a topic, unsubscribe from it in the ntfy app.
 

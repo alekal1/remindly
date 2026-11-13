@@ -50,7 +50,7 @@ public class GarbageCollectionService {
 
       final var savedSize = saveAllGarbageSchedulesNoDuplicate(schedule);
 
-      ntfyClient.notification(ReminderType.GARBAGE_COLLECTION)
+      ntfyClient.notification(ReminderType.CONFIRMATION)
               .withTitle(EventType.GARBAGE_SCHEDULE_RESET.name())
               .withEmojis(EmojiUtils.getEmojisForEventType(EventType.GARBAGE_SCHEDULE_RESET))
               .withMessage(String.format("Garbage collection schedule has been reset. %d entities were added", savedSize))
@@ -116,7 +116,7 @@ public class GarbageCollectionService {
     if (nextEvents.isEmpty()) {
       log.info("No next garbage collection events found");
 
-      ntfyClient.notification(ReminderType.GARBAGE_COLLECTION)
+      ntfyClient.notification(ReminderType.CONFIRMATION)
               .withTitle(String.format("Next %d garbage collection events", limit))
               .withMessage("No events found")
               .withEmojis(EmojiUtils.getEmojisForEventType(EventType.GARBAGE_SCHEDULE_FETCHED))
@@ -125,7 +125,7 @@ public class GarbageCollectionService {
       return;
     }
 
-    ntfyClient.notification(ReminderType.GARBAGE_COLLECTION)
+    ntfyClient.notification(ReminderType.CONFIRMATION)
             .withTitle(String.format("Next %d garbage collection events", limit))
             .withMessage(formatAllEvent(nextEvents))
             .withEmojis(EmojiUtils.getEmojisForEventType(EventType.GARBAGE_SCHEDULE_FETCHED))

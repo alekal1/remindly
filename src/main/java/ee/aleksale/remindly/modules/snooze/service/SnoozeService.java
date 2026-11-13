@@ -40,7 +40,7 @@ public class SnoozeService {
 
     eventRepository.save(snoozedEvent);
 
-    ntfyClient.notification(ReminderType.ADHOC)
+    ntfyClient.notification(ReminderType.CONFIRMATION)
             .withTitle(EventType.SNOOZE.name())
             .withMessage(String.format("Reminder for '%s' is snoozed to %s",
                     parentEvent.getMessage(), snoozedEvent.getScheduledAt()))

@@ -1,6 +1,6 @@
 id: unscheduled_garbage_collection_email_template
 sender: "${UNSCHEDULED_GARBAGE_COLLECTION_SENDER}"
-reminderId: garbage-collection
+reminderId: confirmation
 subjectContains: "jäätmemahuti"
 selector:
   table:

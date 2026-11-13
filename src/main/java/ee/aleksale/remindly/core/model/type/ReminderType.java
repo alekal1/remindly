@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public enum ReminderType {
   ERRORS("errors"),
-  GARBAGE_COLLECTION("garbage-collection"),
+  CONFIRMATION("confirmation"),
   ADHOC("adhoc");
 
   private final String id;

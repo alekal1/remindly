@@ -91,7 +91,7 @@ public class GarbageCollectionServiceTest {
 
     verify(eventRepository).deleteAllByTypeIn(anyList());
     verify(eventRepository).saveAll(eventListCaptor.capture());
-    verify(ntfyClient).notification(ReminderType.GARBAGE_COLLECTION);
+    verify(ntfyClient).notification(ReminderType.CONFIRMATION);
     verify(ntfyRequestBuilder).withMessage(anyString());
     verify(ntfyRequestBuilder).withEmojis(any());
 
@@ -227,7 +227,7 @@ public class GarbageCollectionServiceTest {
     garbageCollectionService.notifyNextEvents(2);
 
     final var messageCaptor = ArgumentCaptor.forClass(String.class);
-    verify(ntfyClient).notification(ReminderType.GARBAGE_COLLECTION);
+    verify(ntfyClient).notification(ReminderType.CONFIRMATION);
     verify(ntfyRequestBuilder).withTitle("Next 2 garbage collection events");
     verify(ntfyRequestBuilder).withMessage(messageCaptor.capture());
     verify(ntfyRequestBuilder).withEmojis(any());
@@ -249,7 +249,7 @@ public class GarbageCollectionServiceTest {
 
     garbageCollectionService.notifyNextEvents(3);
 
-    verify(ntfyClient).notification(ReminderType.GARBAGE_COLLECTION);
+    verify(ntfyClient).notification(ReminderType.CONFIRMATION);
     verify(ntfyRequestBuilder).withTitle("Next 3 garbage collection events");
     verify(ntfyRequestBuilder).withMessage("No events found");
     verify(ntfyRequestBuilder).withEmojis(any());

@@ -53,7 +53,7 @@ public class AdhocServiceTest {
     adhocService.adhoc(dto);
 
     verify(eventRepository).saveAndFlush(eventCaptor.capture());
-    verify(ntfyClient).notification(eventCaptor.getValue().getType().getReminderType());
+    verify(ntfyClient).notification(ReminderType.CONFIRMATION);
 
     final var savedEntity = eventCaptor.getValue();
     assertEquals(EventType.ADHOC, savedEntity.getType());

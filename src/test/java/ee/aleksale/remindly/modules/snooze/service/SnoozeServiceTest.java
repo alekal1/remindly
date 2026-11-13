@@ -76,7 +76,7 @@ public class SnoozeServiceTest {
     snoozeService.snoozeEvent(request);
 
     verify(eventRepository).save(eventCaptor.capture());
-    verify(ntfyClient).notification(ReminderType.ADHOC);
+    verify(ntfyClient).notification(ReminderType.CONFIRMATION);
     verify(ntfyRequestBuilder).withTitle(EventType.SNOOZE.name());
     verify(ntfyRequestBuilder).withMessage(
         String.format("Reminder for '%s' is snoozed to %s", "parent message", expectedScheduledAt));
